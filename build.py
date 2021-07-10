@@ -22,7 +22,7 @@ BUILD_DIR = "_build"
 BUILD_DEPS = os.path.join(BUILD_DIR, "deps")
 BUILD_RELEASE = os.path.join(BUILD_DIR, "release")
 # the bundle commone name and file
-BUNDLE_NAME = "neradoc-keyboard-layouts"
+BUNDLE_NAME = "circuitpython-keyboard-layouts"
 BUNDLE_JSON = os.path.join(BUILD_RELEASE, f"{BUNDLE_NAME}-{TAG}.json")
 # platform dependent
 BUNDLE_PATH_NAME = f"{BUNDLE_NAME}-{{platform}}-{TAG}"
