@@ -15,17 +15,19 @@ import zipfile
 
 import requests
 
-# make the dirs for putting the things in it
+# the date tag for the generated files and stuff
 TAG = datetime.date.today().strftime("%Y%m%d")
+# the dirs for putting the things in it
 BUILD_DIR = "_build"
-BUILD_DEPS = "_build_deps"
-BUILD_ZIPS = "_build_zips"
+BUILD_DEPS = os.path.join(BUILD_DIR, "deps")
+BUILD_RELEASE = os.path.join(BUILD_DIR, "release")
+# the bundle commone name and file
 BUNDLE_NAME = "neradoc-keyboard-layouts"
-BUNDLE_JSON = os.path.join(BUILD_DIR, f"{BUNDLE_NAME}-{TAG}.json")
+BUNDLE_JSON = os.path.join(BUILD_RELEASE, f"{BUNDLE_NAME}-{TAG}.json")
 # platform dependent
 BUNDLE_PATH_NAME = f"{BUNDLE_NAME}-{{platform}}-{TAG}"
 BUNDLE_DIR = os.path.join(BUILD_DIR, BUNDLE_PATH_NAME)
-BUNDLE_ZIP = os.path.join(BUILD_ZIPS, BUNDLE_PATH_NAME + ".zip")
+BUNDLE_ZIP = os.path.join(BUILD_RELEASE, BUNDLE_PATH_NAME + ".zip")
 BUNDLE_LIB_DIR = os.path.join(BUNDLE_DIR, "lib")
 # py platform directory
 BUNDLE_REQ_DIR = os.path.join(BUNDLE_DIR.format(platform="py"), "requirements")
@@ -89,8 +91,9 @@ def list_all_files(path):
 def init_directories():
     """erase and create build directories"""
     # create build directories
+    os.makedirs(BUILD_DIR, exist_ok=True)
     os.makedirs(BUILD_DEPS, exist_ok=True)
-    os.makedirs(BUILD_ZIPS, exist_ok=True)
+    os.makedirs(BUILD_RELEASE, exist_ok=True)
     os.makedirs(fmt(BUNDLE_DIR), exist_ok=True)
 
     # cleanup build directories
