@@ -50,9 +50,7 @@ BUNDLE_ZIP = os.path.join(BUILD_RELEASE, BUNDLE_PATH_NAME + ".zip")
 BUNDLE_LIB_DIR = os.path.join(BUNDLE_DIR, "lib")
 # py platform directory
 BUNDLE_REQ_DIR = os.path.join(BUNDLE_DIR.format(platform="py"), "requirements")
-BUNDLE_ZIP_JSON = os.path.join(
-    BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}-{TAG}.json"
-)
+BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}.json")
 
 SOURCEDIR = "src"
 REQUIREMENTS_FILE = "requirements-modules.txt"
@@ -196,6 +194,7 @@ def do_the_zips():
     """finally create the zip files for release"""
     # now do the zips
     for platform in ["py"] + PLATFORMS:
+        in_path = BUNDLE_PATH_NAME.format(platform=PLATFORM_NAMES[platform])
         bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
         zip_file = BUNDLE_ZIP.format(platform=PLATFORM_NAMES[platform])
         all_files = list_all_files(bun_dir)
@@ -204,7 +203,8 @@ def do_the_zips():
             # build_metadata = {"build-tools-version": build_tools_version}
             # bundle.comment = json.dumps(build_metadata).encode("utf-8")
             for ffile in all_files:
-                bundle.write(os.path.join(bun_dir, ffile), ffile)
+                in_file_path = in_path + "/" + ffile
+                bundle.write(os.path.join(bun_dir, ffile), in_file_path)
 
 
 if __name__ == "__main__":
