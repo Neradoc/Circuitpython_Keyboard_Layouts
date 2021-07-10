@@ -15,8 +15,27 @@ import zipfile
 
 import requests
 
+
+def get_current_version():
+    path = os.getcwd()
+    procs = subprocess.run(
+        [
+            "git",
+            "describe",
+            "--tags",
+            "--exact-match",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=path,
+    )
+    if procs.returncode != 0:
+        return None
+    return procs.stdout.decode("utf8").strip()
+
+
 # the date tag for the generated files and stuff
-TAG = datetime.date.today().strftime("%Y%m%d")
+TAG = get_current_version() or datetime.date.today().strftime("%Y%m%d")
 # the dirs for putting the things in it
 BUILD_DIR = "_build"
 BUILD_DEPS = os.path.join(BUILD_DIR, "deps")
