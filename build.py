@@ -41,9 +41,14 @@ REQUIREMENTS_FILE = "requirements-modules.txt"
 # TODO: retrieve the version number from git
 # TODO: give each file a different version number possibly (that of the latest released change)
 VERSION_NUMBER = "0.0.1"
-THIS_REPOSITORY = "https://github.com/Neradoc/Neradoc-Circuitpython-Keyboard-Layouts"
+THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts"
 
 PLATFORMS = ["mpy6", "mpy7"]
+PLATFORM_NAMES = {
+    "py": "py",
+    "mpy6": "6.x-mpy",
+    "mpy7": "7.x-mpy",
+}
 
 # https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/
 # TODO: identify current OS and pick one
@@ -71,7 +76,7 @@ MPYCROSS = MPYCROSSES[sys.platform]
 
 def fmt(path, platform="py"):
     """shortcut for the py directory"""
-    return path.format(platform=platform)
+    return path.format(platform=PLATFORM_NAMES[platform])
 
 
 # find in python
@@ -98,8 +103,8 @@ def init_directories():
 
     # cleanup build directories
     for platform in ["py"] + PLATFORMS:
-        bun_dir = BUNDLE_DIR.format(platform=platform)
-        zip_file = BUNDLE_ZIP.format(platform=platform)
+        bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
+        zip_file = BUNDLE_ZIP.format(platform=PLATFORM_NAMES[platform])
         if os.path.isdir(bun_dir):
             shutil.rmtree(bun_dir)
         if os.path.isfile(zip_file):
@@ -158,8 +163,8 @@ def make_the_mpy_bundles():
     # duplicate the py dir to mpy6 and mpy7
     for platform in PLATFORMS:
         cross = os.path.join(BUILD_DEPS, MPYCROSS[platform])
-        bun_dir = BUNDLE_DIR.format(platform=platform)
-        lib_dir = BUNDLE_LIB_DIR.format(platform=platform)
+        bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
+        lib_dir = BUNDLE_LIB_DIR.format(platform=PLATFORM_NAMES[platform])
         shutil.copytree(fmt(BUNDLE_DIR), bun_dir)
         # run mpy-cross in each of those
         for lib_file in glob.glob(os.path.join(lib_dir, "*.py")):
@@ -172,8 +177,8 @@ def do_the_zips():
     """finally create the zip files for release"""
     # now do the zips
     for platform in ["py"] + PLATFORMS:
-        bun_dir = BUNDLE_DIR.format(platform=platform)
-        zip_file = BUNDLE_ZIP.format(platform=platform)
+        bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
+        zip_file = BUNDLE_ZIP.format(platform=PLATFORM_NAMES[platform])
         all_files = list_all_files(bun_dir)
         with zipfile.ZipFile(zip_file, "w") as bundle:
             # metadata (bundler version)
