@@ -24,7 +24,7 @@ jobs:
         submodules: true
     - name: Install deps
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
     - name: Build assets
       run: |
         python3 build.py
