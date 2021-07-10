@@ -1,0 +1,31 @@
+name: Build CI
+
+on: [pull_request, push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Versions
+      run: |
+        python3 --version
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Install deps
+      run: |
+        pip install -r requirements-dev.txt
+    - name: Library version
+      run: |
+        git describe --dirty --always --tags
+    - name: Build assets
+      run: |
+        python3 build.py
