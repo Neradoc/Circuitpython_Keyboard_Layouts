@@ -1,6 +1,5 @@
 """
 This makes the bundle zip files and the json file.
-Next step: upload as artifacts/release files in github.
 """
 
 import datetime
@@ -55,10 +54,11 @@ BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}
 SOURCEDIR = "src"
 REQUIREMENTS_FILE = "requirements-modules.txt"
 
-# TODO: retrieve the version number from git
+# TODO: retrieve the version number from git or something
 # TODO: give each file a different version number possibly (that of the latest released change)
+# TODO: fill in the repository from git ?
 VERSION_NUMBER = "0.0.1"
-THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts"
+THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 PLATFORMS = ["mpy6", "mpy7"]
 PLATFORM_NAMES = {

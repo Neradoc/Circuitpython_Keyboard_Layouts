@@ -31,6 +31,11 @@
 #from .keycode import Keycode
 from adafruit_hid.keycode import Keycode
 
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
+
+
 class KeyboardLayoutFR:
     """Map ASCII characters to appropriate keypresses on a FR Mac keyboard.
 
