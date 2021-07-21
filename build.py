@@ -51,7 +51,7 @@ BUNDLE_LIB_DIR = os.path.join(BUNDLE_DIR, "lib")
 BUNDLE_REQ_DIR = os.path.join(BUNDLE_DIR.format(platform="py"), "requirements")
 BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}.json")
 
-SOURCEDIR = "src"
+MODULES_DIR = "libraries"
 REQUIREMENTS_FILE = "requirements-modules.txt"
 
 # TODO: retrieve the version number from git or something
@@ -131,10 +131,10 @@ def init_directories():
 def make_bundle_files():
     """create the .py bundle directory"""
     # copy all the layouts and keycodes
-    shutil.copytree(SOURCEDIR, fmt(BUNDLE_LIB_DIR))
+    shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
 
     # list of the modules
-    all_modules = [mod.replace(".py", "") for mod in os.listdir(SOURCEDIR)]
+    all_modules = [mod.replace(".py", "") for mod in os.listdir(MODULES_DIR)]
 
     json_data = {}
 
