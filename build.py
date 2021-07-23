@@ -152,8 +152,8 @@ def make_bundle_files():
             "version": VERSION_NUMBER,
             "repo": THIS_REPOSITORY,
             "path": "lib/" + module,
-            "dependencies": ["adafruit_hid"],
-            "external_dependencies": [],
+            "dependencies": [],  # "adafruit_hid"
+            "external_dependencies": ["adafruit-circuitpython-hid"],
         }
 
     # create the json file
