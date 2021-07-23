@@ -23,7 +23,7 @@ keyboard_fr.write("Bonjour le monde")
 
 ### Keycodes
 
-`keycode_<platform>_<lang>` modules are an attempt to make it easier to swap layouts. HID Keycodes normally reference the US keyboard. These these localized keycodes offer a level of conversion allowing to use `Keycode.A` across azerty and qwerty keyboards for example. It won't swap `control` and `command` to match the platform however. (yet ?)
+`keycode_<platform>_<lang>` modules are an attempt to make it easier to swap layouts. While keycode numbers are really physical positions on a keyboard, HID Keycodes normally reference the US keyboard for key names. These localized keycodes offer a level of conversion allowing to use `Keycode.A` across azerty and qwerty keyboards for example. It won't swap `control` and `command` to match the platform however. (A helper module could do that).
 
 ```py
 if IS_AZERTY:
