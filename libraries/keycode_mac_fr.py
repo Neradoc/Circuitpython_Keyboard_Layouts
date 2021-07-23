@@ -29,10 +29,6 @@
 """
 
 
-__version__ = "0.0.0-auto.0"
-__repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
-
-
 class Keycode:
 	"""USB HID Keycode constants.
 	This list is modeled after the names for USB keycodes defined in
@@ -102,6 +98,9 @@ class Keycode:
 	Z = 0x1A
 	"""``z`` and ``Z``"""
 
+	AT = 0x64
+	AROBASE = AT
+	"""@ and #"""
 	ONE = 0x1E
 	AMPERSAND = ONE
 	"""``1`` and ``&``"""
@@ -132,9 +131,11 @@ class Keycode:
 	ZERO = 0x27
 	AGRAVE = ZERO
 	"""``0`` and ``à``"""
-	# CLOSEPARENS = 
-	# DEGREE = 
-	# """``)`` and ``°``"""
+	RIGHT_PARENS = 0x2D
+	"""``)`` and ``°``"""
+	MINUS = 0x2E
+	"""``-` and ``_``"""
+
 	ENTER = 0x28
 	"""Enter (Return)"""
 	RETURN = ENTER
@@ -149,30 +150,27 @@ class Keycode:
 	"""Spacebar"""
 	SPACE = SPACEBAR
 	"""Alias for SPACEBAR"""
-	MINUS = 0x2D
-	"""``-` and ``_``"""
-	EQUALS = 0x2E
+	
+	CIRC = 0x2F
+	"""^ and ¨"""
+	DOLLAR = 0x30
+	"""$ and *"""
+	UGRAVE = 0x34
+	"""ù and %"""
+	BACKTICK = 0x31
+	GRAVE_ACCENT = BACKTICK
+	r""":literal:`\`` and ``£``"""
+
+	COMMA = 0x10
+	"""``,`` and ``?``"""
+	SEMICOLON = 0x36
+	"""``;`` and ``.``"""
+	COLON = 0x37
+	""": and /"""
+	EQUALS = 0x38
 	"""``=` and ``+``"""
-	LEFT_BRACKET = 0x2F
-	"""``[`` and ``{``"""
-	RIGHT_BRACKET = 0x30
-	"""``]`` and ``}``"""
-	BACKSLASH = 0x31
-	r"""``\`` and ``|``"""
-	POUND = 0x32
-	"""``#`` and ``~`` (Non-US keyboard)"""
-	SEMICOLON = 0x33
-	"""``;`` and ``:``"""
-	QUOTE = 0x34
-	"""``'`` and ``"``"""
-	GRAVE_ACCENT = 0x35
-	r""":literal:`\`` and ``~``"""
-	COMMA = 0x36
-	"""``,`` and ``<``"""
-	PERIOD = 0x37
-	"""``.`` and ``>``"""
-	FORWARD_SLASH = 0x38
-	"""``/`` and ``?``"""
+	LESS_THAN = 0x35
+	"""< and >"""
 
 	CAPS_LOCK = 0x39
 	"""Caps Lock"""
