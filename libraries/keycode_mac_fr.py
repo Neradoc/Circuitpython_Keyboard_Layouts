@@ -263,8 +263,6 @@ class Keycode:
 	"""Keypad ``0`` and Ins"""
 	KEYPAD_PERIOD = 0x63
 	"""Keypad ``.`` and Del"""
-	KEYPAD_BACKSLASH = 0x64
-	"""Keypad ``\\`` and ``|`` (Non-US)"""
 
 	APPLICATION = 0x65
 	"""Application: also known as the Menu key (Windows)"""

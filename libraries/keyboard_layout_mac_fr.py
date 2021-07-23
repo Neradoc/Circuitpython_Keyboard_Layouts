@@ -22,10 +22,7 @@
 #
 
 """
-`adafruit_hid.keyboard_layout_fr.KeyboardLayoutFR`
-=======================================================
-
-* Author(s): Dan Halbert
+* Author(s): Dan Halbert, Neradoc
 """
 
 #from .keycode import Keycode
@@ -36,8 +33,8 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
-class KeyboardLayoutFR:
-    """Map ASCII characters to appropriate keypresses on a FR Windows keyboard.
+class KeyboardLayoutMacFR:
+    """Map ASCII characters to appropriate keypresses on a FR Mac keyboard.
     Non-ASCII characters and most control characters will raise an exception.
     """
 
@@ -54,56 +51,58 @@ class KeyboardLayoutFR:
     # if it's in a .mpy file, so it doesn't use up valuable RAM.
     #
     # \x00 entries have no keyboard key and so won't be sent.
+    NUL = b'\x00'
     SHIFT = b'\x02'
     ALTGR = b'\x40'
+    ALTSHIFT = b'\x42'
     ASCII_TO_KEYCODE = (
-        b'\x00\x00'    # NUL
-        b'\x00\x00'    # SOH
-        b'\x00\x00'    # STX
-        b'\x00\x00'    # ETX
-        b'\x00\x00'    # EOT
-        b'\x00\x00'    # ENQ
-        b'\x00\x00'    # ACK
-        b'\x00\x00'    # BEL \a
-        b'\x00\x2a'    # BS BACKSPACE \b (called DELETE in the usb.org document)
-        b'\x00\x2b'    # TAB \t
-        b'\x00\x28'    # LF \n (called Return or ENTER in the usb.org document)
-        b'\x00\x00'    # VT \v
-        b'\x00\x00'    # FF \f
-        b'\x00\x00'    # CR \r
-        b'\x00\x00'    # SO
-        b'\x00\x00'    # SI
-        b'\x00\x00'    # DLE
-        b'\x00\x00'    # DC1
-        b'\x00\x00'    # DC2
-        b'\x00\x00'    # DC3
-        b'\x00\x00'    # DC4
-        b'\x00\x00'    # NAK
-        b'\x00\x00'    # SYN
-        b'\x00\x00'    # ETB
-        b'\x00\x00'    # CAN
-        b'\x00\x00'    # EM
-        b'\x00\x00'    # SUB
-        b'\x00\x29'    # ESC
-        b'\x00\x00'    # FS
-        b'\x00\x00'    # GS
-        b'\x00\x00'    # RS
-        b'\x00\x00'    # US
+        NUL+b'\x00'     # NUL
+        +NUL+b'\x00'    # SOH
+        +NUL+b'\x00'    # STX
+        +NUL+b'\x00'    # ETX
+        +NUL+b'\x00'    # EOT
+        +NUL+b'\x00'    # ENQ
+        +NUL+b'\x00'    # ACK
+        +NUL+b'\x00'    # BEL \a
+        +NUL+b'\x2a'    # BS BACKSPACE \b (called DELETE in the usb.org document)
+        +NUL+b'\x2b'    # TAB \t
+        +NUL+b'\x28'    # LF \n (called Return or ENTER in the usb.org document)
+        +NUL+b'\x00'    # VT \v
+        +NUL+b'\x00'    # FF \f
+        +NUL+b'\x00'    # CR \r
+        +NUL+b'\x00'    # SO
+        +NUL+b'\x00'    # SI
+        +NUL+b'\x00'    # DLE
+        +NUL+b'\x00'    # DC1
+        +NUL+b'\x00'    # DC2
+        +NUL+b'\x00'    # DC3
+        +NUL+b'\x00'    # DC4
+        +NUL+b'\x00'    # NAK
+        +NUL+b'\x00'    # SYN
+        +NUL+b'\x00'    # ETB
+        +NUL+b'\x00'    # CAN
+        +NUL+b'\x00'    # EM
+        +NUL+b'\x00'    # SUB
+        +NUL+b'\x29'    # ESC
+        +NUL+b'\x00'    # FS
+        +NUL+b'\x00'    # GS
+        +NUL+b'\x00'    # RS
+        +NUL+b'\x00'    # US
         
-        b'\x00\x2c'       #  ' '
-        b'\x00\x38'       # !
-        b'\x00\x20'       # "
-        +SHIFT+b'\x20'    # #
-        b'\x00\x30'       # $
+        +NUL+b'\x2c'       #  ' '
+        +NUL+b'\x25'       # !
+        +NUL+b'\x20'       # "
+        +SHIFT+b'\x64'    # #
+        +NUL+b'\x30'       # $
         +SHIFT+b'\x34'    # %
-        b'\x00\x1E'       # &
-        b'\x00\x21'       # '
-        b'\x00\x22'       # (
-        b'\x00\x2d'       # )
-        b'\x00\x31'       # *
-        +SHIFT+b'\x2e'    # +
-        b'\x00\x10'       # ,
-        b'\x00\x23'       # -
+        +NUL+b'\x1E'       # &
+        +NUL+b'\x21'       # '
+        +NUL+b'\x22'       # (
+        +NUL+b'\x2d'       # )
+        +SHIFT+b'\x30'    # *
+        +SHIFT+b'\x38'    # +
+        +NUL+b'\x10'       # ,
+        +NUL+b'\x2E'       # -
         +SHIFT+b'\x36'    # .
         +SHIFT+b'\x37'    # /
         +SHIFT+b'\x27'    # 0
@@ -116,13 +115,13 @@ class KeyboardLayoutFR:
         +SHIFT+b'\x24'    # 7
         +SHIFT+b'\x25'    # 8
         +SHIFT+b'\x26'    # 9
-        b'\x00\x37'       # :
-        b'\x00\x36'       # ;
-        b'\x00\x64'       # <
-        b'\x00\x2e'       # =
-        +SHIFT+b'\x64'    # >
+        +NUL+b'\x37'       # :
+        +NUL+b'\x36'       # ;
+        +NUL+b'\x35'       # <
+        +NUL+b'\x38'       # =
+        +SHIFT+b'\x35'    # >
         +SHIFT+b'\x10'    # ?
-        +ALTGR+b'\x27'    # @
+        +NUL+b'\x64'       # @
         +SHIFT+b'\x14'    # A
         +SHIFT+b'\x05'    # B
         +SHIFT+b'\x06'    # C
@@ -149,43 +148,43 @@ class KeyboardLayoutFR:
         +SHIFT+b'\x1b'    # X
         +SHIFT+b'\x1c'    # Y
         +SHIFT+b'\x1a'    # Z
-        +ALTGR+b'\x22'    # [
-        b'\x00\x31'       # bslash
-        +ALTGR+b'\x2d'    # ]
-        b'\x00\x2F'       # ^
-        b'\x00\x25'       # _
-        +ALTGR+b'\x24'    # `
-        b'\x00\x14'       # a
-        b'\x00\x05'       # b
-        b'\x00\x06'       # c
-        b'\x00\x07'       # d
-        b'\x00\x08'       # e
-        b'\x00\x09'       # f
-        b'\x00\x0a'       # g
-        b'\x00\x0b'       # h
-        b'\x00\x0c'       # i
-        b'\x00\x0d'       # j
-        b'\x00\x0e'       # k
-        b'\x00\x0f'       # l
-        b'\x00\x33'       # m
-        b'\x00\x11'       # n
-        b'\x00\x12'       # o
-        b'\x00\x13'       # p
-        b'\x00\x04'       # q
-        b'\x00\x15'       # r
-        b'\x00\x16'       # s
-        b'\x00\x17'       # t
-        b'\x00\x18'       # u
-        b'\x00\x19'       # v
-        b'\x00\x1d'       # w
-        b'\x00\x1b'       # x
-        b'\x00\x1c'       # y
-        b'\x00\x1a'       # z
-        +ALTGR+b'\x21'    # {
-        +ALTGR+b'\x23'    # |
-        +ALTGR+b'\x2e'    # }
-        +ALTGR+b'\x19'    # ~ TODO
-        b'\x00\x00'       # DEL
+        +ALTSHIFT+b'\x22'    # [
+        +ALTSHIFT+b'\x37'       # bslash
+        +ALTSHIFT+b'\x2d'    # ]
+        +NUL+b'\x2F'       # ^
+        +SHIFT+b'\x2E'       # _
+        +NUL+b'\x31'    # `
+        +NUL+b'\x14'       # a
+        +NUL+b'\x05'       # b
+        +NUL+b'\x06'       # c
+        +NUL+b'\x07'       # d
+        +NUL+b'\x08'       # e
+        +NUL+b'\x09'       # f
+        +NUL+b'\x0a'       # g
+        +NUL+b'\x0b'       # h
+        +NUL+b'\x0c'       # i
+        +NUL+b'\x0d'       # j
+        +NUL+b'\x0e'       # k
+        +NUL+b'\x0f'       # l
+        +NUL+b'\x33'       # m
+        +NUL+b'\x11'       # n
+        +NUL+b'\x12'       # o
+        +NUL+b'\x13'       # p
+        +NUL+b'\x04'       # q
+        +NUL+b'\x15'       # r
+        +NUL+b'\x16'       # s
+        +NUL+b'\x17'       # t
+        +NUL+b'\x18'       # u
+        +NUL+b'\x19'       # v
+        +NUL+b'\x1d'       # w
+        +NUL+b'\x1b'       # x
+        +NUL+b'\x1c'       # y
+        +NUL+b'\x1a'       # z
+        +ALTGR+b'\x22'    # {
+        +ALTSHIFT+b'\x0f'    # |
+        +ALTGR+b'\x2d'    # }
+        +ALTGR+b'\x11'    # ~ TODO
+        +NUL+b'\x00'       # DEL
     )
 
     def __init__(self, keyboard):
