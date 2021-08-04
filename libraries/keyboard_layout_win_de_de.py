@@ -90,7 +90,7 @@ class KeyboardLayoutWinDeDe(KeyboardLayout):
         b"\xa7"     # =
         b"\xe4"     # >
         b"\xad"     # ?
-        b"\x14",      # @
+        b"\x14"      # @
         b"\x84"     # A
         b"\x85"     # B
         b"\x86"     # C
@@ -117,9 +117,9 @@ class KeyboardLayoutWinDeDe(KeyboardLayout):
         b"\x9b"     # X
         b"\x9d"     # Y
         b"\x9c"     # Z
-        b"\x25",      # [
-        b"\x2d",      # bslash \
-        b"\x26",      # ]
+        b"\x25"      # [
+        b"\x2d"      # bslash \
+        b"\x26"      # ]
         b"\x35"                         # ^
         b"\xb8"     # _
         b"\xae"     # `
@@ -149,10 +149,10 @@ class KeyboardLayoutWinDeDe(KeyboardLayout):
         b"\x1b"                         # x
         b"\x1d"                         # y
         b"\x1c"                         # z
-        b"\x24",      # {
-        b"\x64",      # |
-        b"\x27",      # }
-        b"\x30",      # ~
+        b"\x24"      # {
+        b"\x64"      # |
+        b"\x27"      # }
+        b"\x30"      # ~
         b"\x4c"				            # DEL
         b"\x00" # [NOT printable] in some docs shown as € symbol, but not so in python
         b"\x00" # [not printable]
@@ -204,10 +204,10 @@ class KeyboardLayoutWinDeDe(KeyboardLayout):
         b"\x00" # ¯
         b"\xb5"     # °
         b"\x00" # ±
-        b"\x1f",      # ²
-        b"\x20",      # ³
+        b"\x1f"      # ²
+        b"\x20"      # ³
         b"\x2e"                         # ´
-        b"\x10",      # µ
+        b"\x10"      # µ
         b"\x00" # ¶
         b"\x00" # ·
         b"\x00" # ¸

@@ -92,7 +92,7 @@ class KeyboardLayout:
 
         return codes
 
-    def _above128charval_to_keycode(self, char_val):
+    def _above128char_to_keycode(self, char):
         """Return keycode for above 128 ascii codes.
 
         Since the values are sparse, this may be more space efficient than bloating the table above
@@ -101,12 +101,15 @@ class KeyboardLayout:
         :param char_val: ascii char value
         :return: keycode, with modifiers if needed
         """
-        if char_val in self.HIGHER_ASCII:
-            return self.HIGHER_ASCII[char_val]
-        if ord(char_val) in self.HIGHER_ASCII:
-            return self.HIGHER_ASCII[char_val]
+        if char in self.HIGHER_ASCII:
+            return self.HIGHER_ASCII[char]
+        if ord(char) in self.HIGHER_ASCII:
+            return self.HIGHER_ASCII[ord(char)]
 
-        raise ValueError("Unsupported non-ASCII character \\x{}.".format(ord(char_val)))
+        raise ValueError(
+            "Unsupported non-ASCII character {} \\x{}."
+            .format(str(char), ord(char))
+        )
 
     def _char_to_keycode(self, char):
         """Return the HID keycode for the given ASCII character, with the SHIFT_FLAG possibly set.
@@ -115,9 +118,12 @@ class KeyboardLayout:
         You must clear this bit before passing the keycode in a USB report.
         """
         char_val = ord(char)
-        if char_val > 128:
-            return self._above128charval_to_keycode(char)
+        if char_val > len(self.ASCII_TO_KEYCODE):
+            return self._above128char_to_keycode(char)
         keycode = self.ASCII_TO_KEYCODE[char_val]
         if keycode == 0:
-            raise ValueError("No keycode available for character.")
+            raise ValueError(
+                "No keycode available for character {} \\x{}."
+                .format(str(char), char_val)
+            )
         return keycode
