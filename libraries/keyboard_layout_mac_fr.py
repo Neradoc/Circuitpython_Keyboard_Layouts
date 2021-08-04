@@ -25,15 +25,14 @@
 * Author(s): Dan Halbert, Neradoc
 """
 
-#from .keycode import Keycode
-from adafruit_hid.keycode import Keycode
+from keyboard_layout import KeyboardLayout
 
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
-class KeyboardLayoutMacFR:
+class KeyboardLayoutMacFR(KeyboardLayout):
     """Map ASCII characters to appropriate keypresses on a FR Mac keyboard.
     Non-ASCII characters and most control characters will raise an exception.
     """
@@ -51,216 +50,150 @@ class KeyboardLayoutMacFR:
     # if it's in a .mpy file, so it doesn't use up valuable RAM.
     #
     # \x00 entries have no keyboard key and so won't be sent.
-    NUL = b'\x00'
-    SHIFT = b'\x02'
-    ALTGR = b'\x40'
-    ALTSHIFT = b'\x42'
+    SHIFT_FLAG = 0x80
+    
     ASCII_TO_KEYCODE = (
-        NUL+b'\x00'     # NUL
-        +NUL+b'\x00'    # SOH
-        +NUL+b'\x00'    # STX
-        +NUL+b'\x00'    # ETX
-        +NUL+b'\x00'    # EOT
-        +NUL+b'\x00'    # ENQ
-        +NUL+b'\x00'    # ACK
-        +NUL+b'\x00'    # BEL \a
-        +NUL+b'\x2a'    # BS BACKSPACE \b (called DELETE in the usb.org document)
-        +NUL+b'\x2b'    # TAB \t
-        +NUL+b'\x28'    # LF \n (called Return or ENTER in the usb.org document)
-        +NUL+b'\x00'    # VT \v
-        +NUL+b'\x00'    # FF \f
-        +NUL+b'\x00'    # CR \r
-        +NUL+b'\x00'    # SO
-        +NUL+b'\x00'    # SI
-        +NUL+b'\x00'    # DLE
-        +NUL+b'\x00'    # DC1
-        +NUL+b'\x00'    # DC2
-        +NUL+b'\x00'    # DC3
-        +NUL+b'\x00'    # DC4
-        +NUL+b'\x00'    # NAK
-        +NUL+b'\x00'    # SYN
-        +NUL+b'\x00'    # ETB
-        +NUL+b'\x00'    # CAN
-        +NUL+b'\x00'    # EM
-        +NUL+b'\x00'    # SUB
-        +NUL+b'\x29'    # ESC
-        +NUL+b'\x00'    # FS
-        +NUL+b'\x00'    # GS
-        +NUL+b'\x00'    # RS
-        +NUL+b'\x00'    # US
+        b'\x00'     # NUL
+        b'\x00'    # SOH
+        b'\x00'    # STX
+        b'\x00'    # ETX
+        b'\x00'    # EOT
+        b'\x00'    # ENQ
+        b'\x00'    # ACK
+        b'\x00'    # BEL \a
+        b'\x2a'    # BS BACKSPACE \b (called DELETE in the usb.org document)
+        b'\x2b'    # TAB \t
+        b'\x28'    # LF \n (called Return or ENTER in the usb.org document)
+        b'\x00'    # VT \v
+        b'\x00'    # FF \f
+        b'\x00'    # CR \r
+        b'\x00'    # SO
+        b'\x00'    # SI
+        b'\x00'    # DLE
+        b'\x00'    # DC1
+        b'\x00'    # DC2
+        b'\x00'    # DC3
+        b'\x00'    # DC4
+        b'\x00'    # NAK
+        b'\x00'    # SYN
+        b'\x00'    # ETB
+        b'\x00'    # CAN
+        b'\x00'    # EM
+        b'\x00'    # SUB
+        b'\x29'    # ESC
+        b'\x00'    # FS
+        b'\x00'    # GS
+        b'\x00'    # RS
+        b'\x00'    # US
         
-        +NUL+b'\x2c'       #  ' '
-        +NUL+b'\x25'       # !
-        +NUL+b'\x20'       # "
-        +SHIFT+b'\x64'    # #
-        +NUL+b'\x30'       # $
-        +SHIFT+b'\x34'    # %
-        +NUL+b'\x1E'       # &
-        +NUL+b'\x21'       # '
-        +NUL+b'\x22'       # (
-        +NUL+b'\x2d'       # )
-        +SHIFT+b'\x30'    # *
-        +SHIFT+b'\x38'    # +
-        +NUL+b'\x10'       # ,
-        +NUL+b'\x2E'       # -
-        +SHIFT+b'\x36'    # .
-        +SHIFT+b'\x37'    # /
-        +SHIFT+b'\x27'    # 0
-        +SHIFT+b'\x1e'    # 1
-        +SHIFT+b'\x1f'    # 2
-        +SHIFT+b'\x20'    # 3
-        +SHIFT+b'\x21'    # 4
-        +SHIFT+b'\x22'    # 5
-        +SHIFT+b'\x23'    # 6
-        +SHIFT+b'\x24'    # 7
-        +SHIFT+b'\x25'    # 8
-        +SHIFT+b'\x26'    # 9
-        +NUL+b'\x37'       # :
-        +NUL+b'\x36'       # ;
-        +NUL+b'\x35'       # <
-        +NUL+b'\x38'       # =
-        +SHIFT+b'\x35'    # >
-        +SHIFT+b'\x10'    # ?
-        +NUL+b'\x64'       # @
-        +SHIFT+b'\x14'    # A
-        +SHIFT+b'\x05'    # B
-        +SHIFT+b'\x06'    # C
-        +SHIFT+b'\x07'    # D
-        +SHIFT+b'\x08'    # E
-        +SHIFT+b'\x09'    # F
-        +SHIFT+b'\x0a'    # G
-        +SHIFT+b'\x0b'    # H
-        +SHIFT+b'\x0c'    # I
-        +SHIFT+b'\x0d'    # J
-        +SHIFT+b'\x0e'    # K
-        +SHIFT+b'\x0f'    # L
-        +SHIFT+b'\x33'    # M
-        +SHIFT+b'\x11'    # N
-        +SHIFT+b'\x12'    # O
-        +SHIFT+b'\x13'    # P
-        +SHIFT+b'\x04'    # Q
-        +SHIFT+b'\x15'    # R
-        +SHIFT+b'\x16'    # S
-        +SHIFT+b'\x17'    # T
-        +SHIFT+b'\x18'    # U
-        +SHIFT+b'\x19'    # V
-        +SHIFT+b'\x1d'    # W
-        +SHIFT+b'\x1b'    # X
-        +SHIFT+b'\x1c'    # Y
-        +SHIFT+b'\x1a'    # Z
-        +ALTSHIFT+b'\x22'    # [
-        +ALTSHIFT+b'\x37'       # bslash
-        +ALTSHIFT+b'\x2d'    # ]
-        +NUL+b'\x2F'       # ^
-        +SHIFT+b'\x2E'       # _
-        +NUL+b'\x31'    # `
-        +NUL+b'\x14'       # a
-        +NUL+b'\x05'       # b
-        +NUL+b'\x06'       # c
-        +NUL+b'\x07'       # d
-        +NUL+b'\x08'       # e
-        +NUL+b'\x09'       # f
-        +NUL+b'\x0a'       # g
-        +NUL+b'\x0b'       # h
-        +NUL+b'\x0c'       # i
-        +NUL+b'\x0d'       # j
-        +NUL+b'\x0e'       # k
-        +NUL+b'\x0f'       # l
-        +NUL+b'\x33'       # m
-        +NUL+b'\x11'       # n
-        +NUL+b'\x12'       # o
-        +NUL+b'\x13'       # p
-        +NUL+b'\x04'       # q
-        +NUL+b'\x15'       # r
-        +NUL+b'\x16'       # s
-        +NUL+b'\x17'       # t
-        +NUL+b'\x18'       # u
-        +NUL+b'\x19'       # v
-        +NUL+b'\x1d'       # w
-        +NUL+b'\x1b'       # x
-        +NUL+b'\x1c'       # y
-        +NUL+b'\x1a'       # z
-        +ALTGR+b'\x22'    # {
-        +ALTSHIFT+b'\x0f'    # |
-        +ALTGR+b'\x2d'    # }
-        +ALTGR+b'\x11'    # ~ TODO
-        +NUL+b'\x00'       # DEL
+        b'\x2c'       #  ' '
+        b'\x25'       # !
+        b'\x20'       # "
+        b'\xe4'    # #
+        b'\x30'       # $
+        b'\xb4'    # %
+        b'\x1E'       # &
+        b'\x21'       # '
+        b'\x22'       # (
+        b'\x2d'       # )
+        b'\xb0'    # *
+        b'\xb8'    # +
+        b'\x10'       # ,
+        b'\x2E'       # -
+        b'\xb6'    # .
+        b'\xb7'    # /
+        b'\xa7'    # 0
+        b'\x9e'    # 1
+        b'\x9f'    # 2
+        b'\xa0'    # 3
+        b'\xa1'    # 4
+        b'\xa2'    # 5
+        b'\xa3'    # 6
+        b'\xa4'    # 7
+        b'\xa5'    # 8
+        b'\xa6'    # 9
+        b'\x37'       # :
+        b'\x36'       # ;
+        b'\x35'       # <
+        b'\x38'       # =
+        b'\xb5'    # >
+        b'\x90'    # ?
+        b'\x64'       # @
+        b'\x94'    # A
+        b'\x85'    # B
+        b'\x86'    # C
+        b'\x87'    # D
+        b'\x88'    # E
+        b'\x89'    # F
+        b'\x8a'    # G
+        b'\x8b'    # H
+        b'\x8c'    # I
+        b'\x8d'    # J
+        b'\x8e'    # K
+        b'\x8f'    # L
+        b'\xb3'    # M
+        b'\x91'    # N
+        b'\x92'    # O
+        b'\x93'    # P
+        b'\x84'    # Q
+        b'\x95'    # R
+        b'\x96'    # S
+        b'\x97'    # T
+        b'\x98'    # U
+        b'\x99'    # V
+        b'\x9d'    # W
+        b'\x9b'    # X
+        b'\x9c'    # Y
+        b'\x9a'    # Z
+        b'\xa2'    # [
+        b'\xb7'       # bslash
+        b'\xad'    # ]
+        b'\x2F'       # ^
+        b'\xaE'       # _
+        b'\x31'    # `
+        b'\x14'       # a
+        b'\x05'       # b
+        b'\x06'       # c
+        b'\x07'       # d
+        b'\x08'       # e
+        b'\x09'       # f
+        b'\x0a'       # g
+        b'\x0b'       # h
+        b'\x0c'       # i
+        b'\x0d'       # j
+        b'\x0e'       # k
+        b'\x0f'       # l
+        b'\x33'       # m
+        b'\x11'       # n
+        b'\x12'       # o
+        b'\x13'       # p
+        b'\x04'       # q
+        b'\x15'       # r
+        b'\x16'       # s
+        b'\x17'       # t
+        b'\x18'       # u
+        b'\x19'       # v
+        b'\x1d'       # w
+        b'\x1b'       # x
+        b'\x1c'       # y
+        b'\x1a'       # z
+        b'\x22'    # {
+        b'\x1f'    # |
+        b'\x2d'    # }
+        b'\x11'    # ~ TODO
+        b'\x00'       # DEL
     )
 
-    def __init__(self, keyboard):
-        """Specify the layout for the given keyboard.
+    NEED_ALTGR = "[]\\{}|~€"
+    HIGHER_ASCII = {
+        "à": 0x27,  # à
+        "ç": 0x26,  # ç
+        "è": 0x24,  # è
+        "é": 0x1F,  # é
+        "ù": 0x34,  # ù
+        "€": 0x30,  # € - altgr will be added thanks to NEED_ALTGR
+        "°": 0xAD,  # °
+        "§": 0x23,  # §
+        #  TODO: add missing ÀÈÉÙ
+    }
 
-        :param keyboard: a Keyboard object. Write characters to this keyboard when requested.
-
-        Example::
-
-            kbd = Keyboard()
-            layout = KeyboardLayoutFR(kbd)
-        """
-
-        self.keyboard = keyboard
-
-    def write(self, string):
-        """Type the string by pressing and releasing keys on my keyboard.
-
-        :param string: A string of ASCII characters.
-        :raises ValueError: if any of the characters are not ASCII or have no keycode
-            (such as some control characters).
-
-        Example::
-
-            # Write abc followed by Enter to the keyboard
-            layout.write('abc\\n')
-        """
-        for char in string:
-            (modifier,keycode) = self._char_to_keycode(char)
-            # If this is a shifted char, clear the SHIFT flag and press the SHIFT key.
-            if modifier & self.SHIFT[0]:
-                self.keyboard.press(Keycode.SHIFT)
-            if modifier & self.ALTGR[0]:
-                self.keyboard.press(Keycode.GUI)
-            self.keyboard.press(keycode)
-            self.keyboard.release_all()
-
-    def keycodes(self, char):
-        """Return a tuple of keycodes needed to type the given character.
-
-        :param char: A single ASCII character in a string.
-        :type char: str of length one.
-        :returns: tuple of Keycode keycodes.
-        :raises ValueError: if ``char`` is not ASCII or there is no keycode for it.
-
-        Examples::
-
-            # Returns (Keycode.TAB,)
-            keycodes('\t')
-            # Returns (Keycode.A,)
-            keycode('a')
-            # Returns (Keycode.SHIFT, Keycode.A)
-            keycode('A')
-            # Raises ValueError because it's a accented e and is not ASCII
-            keycode('é')
-        """
-        out = []
-        (modifier,keycode) = self._char_to_keycode(char)
-        if modifier & self.SHIFT:
-            out += [Keycode.SHIFT]
-        if modifier & self.ALTGR:
-            out += [Keycode.GUI]
-        out += [keycode]
-        return out
-
-    def _char_to_keycode(self, char):
-        """Return the HID keycode for the given ASCII character, with the SHIFT_FLAG possibly set.
-
-        If the character requires pressing the Shift key, the SHIFT_FLAG bit is set.
-        You must clear this bit before passing the keycode in a USB report.
-        """
-        char_val = ord(char)*2
-        if char_val+1 >= len(self.ASCII_TO_KEYCODE):
-            raise ValueError("Unknown character.")
-        modifier = self.ASCII_TO_KEYCODE[char_val]
-        keycode = self.ASCII_TO_KEYCODE[char_val+1]
-        if keycode == 0:
-            raise ValueError("No keycode available for character.")
-        return (modifier,keycode)
