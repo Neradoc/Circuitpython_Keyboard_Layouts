@@ -82,12 +82,15 @@ class KeyboardLayout:
             keycodes('é')
         """
         keycode = self._char_to_keycode(char)
-        if keycode & self.SHIFT_FLAG:
-            return (self.SHIFT_CODE, keycode & ~self.SHIFT_FLAG)
+        codes = []
         if char in self.NEED_ALTGR:
-            return (self.RIGHT_ALT_CODE, keycode)
+            codes.append(self.RIGHT_ALT_CODE)
+        if keycode & self.SHIFT_FLAG:
+            codes.extend((self.SHIFT_CODE, keycode & ~self.SHIFT_FLAG))
+        else:
+            codes.append(keycode)
 
-        return (keycode,)
+        return codes
 
     def _above128charval_to_keycode(self, char_val):
         """Return keycode for above 128 ascii codes.
