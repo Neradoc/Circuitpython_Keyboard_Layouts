@@ -25,10 +25,9 @@
 `adafruit_hid.keyboard_layout_fr.KeyboardLayoutFR`
 =======================================================
 
-* Author(s): Dan Halbert
+* Author(s): Dan Halbert, Neradoc
 """
 
-#from .keycode import Keycode
 from adafruit_hid.keycode import Keycode
 
 
@@ -185,7 +184,7 @@ class KeyboardLayoutFR:
         +ALTGR+b'\x23'    # |
         +ALTGR+b'\x2e'    # }
         +ALTGR+b'\x19'    # ~ TODO
-        b'\x00\x00'       # DEL
+        b'\x00\x4c'       # TODO DEL 
     )
 
     def __init__(self, keyboard):
@@ -194,7 +193,6 @@ class KeyboardLayoutFR:
         :param keyboard: a Keyboard object. Write characters to this keyboard when requested.
 
         Example::
-
             kbd = Keyboard()
             layout = KeyboardLayoutFR(kbd)
         """
@@ -209,7 +207,6 @@ class KeyboardLayoutFR:
             (such as some control characters).
 
         Example::
-
             # Write abc followed by Enter to the keyboard
             layout.write('abc\\n')
         """
@@ -232,7 +229,6 @@ class KeyboardLayoutFR:
         :raises ValueError: if ``char`` is not ASCII or there is no keycode for it.
 
         Examples::
-
             # Returns (Keycode.TAB,)
             keycodes('\t')
             # Returns (Keycode.A,)
@@ -253,7 +249,6 @@ class KeyboardLayoutFR:
 
     def _char_to_keycode(self, char):
         """Return the HID keycode for the given ASCII character, with the SHIFT_FLAG possibly set.
-
         If the character requires pressing the Shift key, the SHIFT_FLAG bit is set.
         You must clear this bit before passing the keycode in a USB report.
         """
