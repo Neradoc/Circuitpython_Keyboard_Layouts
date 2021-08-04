@@ -134,7 +134,11 @@ def make_bundle_files():
     shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
 
     # list of the modules
-    all_modules = [mod.replace(".py", "") for mod in os.listdir(MODULES_DIR)]
+    all_modules = [
+        mod.replace(".py", "")
+        for mod in os.listdir(MODULES_DIR)
+        if not mod.startswith(".")
+    ]
 
     json_data = {}
 
@@ -155,6 +159,11 @@ def make_bundle_files():
             "dependencies": [],  # "adafruit_hid"
             "external_dependencies": ["adafruit-circuitpython-hid"],
         }
+        # add the dependency to keyboard_layout
+        if module.startswith("keyboard_layout_"):
+            json_data[module]["dependencies"].append("keyboard_layout")
+            with open(target,"a") as fp:
+                fp.write("\r\nkeyboard_layout\r\n")
 
     # create the json file
     with open(BUNDLE_JSON, "w") as out_file:
