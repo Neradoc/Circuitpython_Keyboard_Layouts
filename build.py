@@ -6,6 +6,7 @@ import datetime
 import glob
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -18,23 +19,32 @@ import requests
 def get_current_version():
     path = os.getcwd()
     procs = subprocess.run(
-        [
-            "git",
-            "describe",
-            "--tags",
-            "--exact-match",
-        ],
+        "git describe --tags --exact-match",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=path,
+        shell=True
     )
     if procs.returncode != 0:
         return None
     return procs.stdout.decode("utf8").strip()
 
+def date_to_version(tag):
+    # YYYYMMDD
+    if re.match('\d\d\d\d\d\d\d\d', tag):
+        year = int(tag[2:4]) - 20
+        month = int(tag[4:6])
+        day = int(tag[6:8])
+        return f"{year}.{month}.{day}"
+    else:
+        return tag
 
 # the date tag for the generated files and stuff
+# TODO: retrieve the version number from git or something
+# TODO: give each file a different version number possibly
+#       (that of the latest released change if possible)
 TAG = get_current_version() or datetime.date.today().strftime("%Y%m%d")
+VERSION_NUMBER = date_to_version(TAG)
 # the dirs for putting the things in it
 BUILD_DIR = "_build"
 BUILD_DEPS = os.path.join(BUILD_DIR, "deps")
@@ -54,10 +64,7 @@ BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}
 MODULES_DIR = "libraries"
 REQUIREMENTS_FILE = "requirements-modules.txt"
 
-# TODO: retrieve the version number from git or something
-# TODO: give each file a different version number possibly (that of the latest released change)
-# TODO: fill in the repository from git ?
-VERSION_NUMBER = "0.0.1"
+SET_VERSION = f"__version__ = '{VERSION_NUMBER}'"
 THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 PLATFORMS = ["mpy6", "mpy7"]
@@ -132,6 +139,18 @@ def make_bundle_files():
     """create the .py bundle directory"""
     # copy all the layouts and keycodes
     shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
+
+    # change the version number of all the bundles
+    py_files = os.path.join(fmt(BUNDLE_LIB_DIR), "**", "*.py")
+    for module in glob.glob(py_files, recursive=True):
+        with open(module, "r") as fp:
+            data = fp.read()
+        data = data.replace(
+            '\n__version__ = "0.0.0-auto.0"\n',
+            f"\n{SET_VERSION}\n",
+        )
+        with open(module, "w") as fp:
+            fp.write(data)
 
     # list of the modules
     all_modules = [

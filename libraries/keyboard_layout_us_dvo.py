@@ -1,5 +1,6 @@
 from keyboard_layout import KeyboardLayout
 
+
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 

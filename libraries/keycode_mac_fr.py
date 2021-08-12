@@ -29,6 +29,10 @@
 """
 
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
+
+
 class Keycode:
 	"""USB HID Keycode constants.
 	This list is modeled after the names for USB keycodes defined in
