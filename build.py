@@ -15,19 +15,20 @@ import zipfile
 
 import requests
 
-
-def get_current_version():
+def get_git_command(command):
     path = os.getcwd()
     procs = subprocess.run(
-        "git describe --tags --exact-match",
+        command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=path,
-        shell=True
     )
     if procs.returncode != 0:
         return None
     return procs.stdout.decode("utf8").strip()
+
+def get_current_version():
+    return get_git_command("git describe --tags --exact-match".split())
 
 def date_to_version(tag):
     # YYYYMMDD
@@ -60,11 +61,12 @@ BUNDLE_LIB_DIR = os.path.join(BUNDLE_DIR, "lib")
 # py platform directory
 BUNDLE_REQ_DIR = os.path.join(BUNDLE_DIR.format(platform="py"), "requirements")
 BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}.json")
-
+# where the modules are
 MODULES_DIR = "libraries"
+# the base requirement file
 REQUIREMENTS_FILE = "requirements-modules.txt"
-
-SET_VERSION = f"__version__ = '{VERSION_NUMBER}'"
+# in-file informations to update (or not)
+SET_VERSION_PATTERN = "\n__version__ = '{}'\n"
 THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 PLATFORMS = ["mpy6", "mpy7"]
@@ -96,6 +98,21 @@ MPYCROSSES = {
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
+
+
+def file_version_tag(path):
+    hash = get_git_command(["git", "log", "-1", '--pretty=%H', path])
+    #ptag = get_git_command(["git", "describe", "--tags", "--always", hash])
+    #pdate = re.split(r"[~-]", ptag)[0]
+    ctag = get_git_command(["git", "describe", "--tags", "--always", "--contains", hash])
+    cdate = re.split(r"[~-]", ctag)[0]
+    if "." in cdate:
+        ver = cdate
+    elif hash.startswith(cdate):
+        ver = date_to_version(TAG)
+    else:
+        ver = date_to_version(cdate[0:8])
+    return ver
 
 
 def fmt(path, platform="py"):
@@ -141,16 +158,18 @@ def make_bundle_files():
     shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
 
     # change the version number of all the bundles
-    py_files = os.path.join(fmt(BUNDLE_LIB_DIR), "**", "*.py")
-    for module in glob.glob(py_files, recursive=True):
-        with open(module, "r") as fp:
+    for module_local in list_all_files(MODULES_DIR):
+        module_file = os.path.join(fmt(BUNDLE_LIB_DIR), module_local)
+        file_tag = file_version_tag(os.path.join(MODULES_DIR, module_local))
+        with open(module_file, "r") as fp:
             data = fp.read()
-        data = data.replace(
-            '\n__version__ = "0.0.0-auto.0"\n',
-            f"\n{SET_VERSION}\n",
-        )
-        with open(module, "w") as fp:
-            fp.write(data)
+        if "__version__" in data:
+            data = data.replace(
+                '\n__version__ = "0.0.0-auto.0"\n',
+                SET_VERSION_PATTERN.format(file_tag),
+            )
+            with open(module_file, "w") as fp:
+                fp.write(data)
 
     # list of the modules
     all_modules = [
