@@ -14,31 +14,38 @@ import sys
 import zipfile
 
 import requests
+import semver
+
 
 def get_git_command(command):
+    """Execute and return the result of a git command without error."""
     path = os.getcwd()
     procs = subprocess.run(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        check=False,
         cwd=path,
     )
     if procs.returncode != 0:
         return None
     return procs.stdout.decode("utf8").strip()
 
+
 def get_current_version():
+    """Get current version string."""
     return get_git_command("git describe --tags --exact-match".split())
 
+
 def date_to_version(tag):
-    # YYYYMMDD
-    if re.match('\d\d\d\d\d\d\d\d', tag):
+    """Convert a tag from YYYYMMDD to y.M.D where y is years after 2020."""
+    if re.match(r"\d\d\d\d\d\d\d\d", tag):
         year = int(tag[2:4]) - 20
         month = int(tag[4:6])
         day = int(tag[6:8])
         return f"{year}.{month}.{day}"
-    else:
-        return tag
+    return tag
+
 
 # the date tag for the generated files and stuff
 # TODO: retrieve the version number from git or something
@@ -101,10 +108,15 @@ MPYCROSS = MPYCROSSES[sys.platform]
 
 
 def file_version_tag(path):
-    hash = get_git_command(["git", "log", "-1", '--pretty=%H', path])
-    #ptag = get_git_command(["git", "describe", "--tags", "--always", hash])
-    #pdate = re.split(r"[~-]", ptag)[0]
-    ctag = get_git_command(["git", "describe", "--tags", "--always", "--contains", hash])
+    """
+    Find a suitable version tag for a file using commit dates.
+    """
+    hash = get_git_command(["git", "log", "-1", "--pretty=%H", path])
+    # ptag = get_git_command(["git", "describe", "--tags", "--always", hash])
+    # pdate = re.split(r"[~-]", ptag)[0]
+    ctag = get_git_command(
+        ["git", "describe", "--tags", "--always", "--contains", hash]
+    )
     cdate = re.split(r"[~-]", ctag)[0]
     if "." in cdate:
         ver = cdate
@@ -116,13 +128,13 @@ def file_version_tag(path):
 
 
 def fmt(path, platform="py"):
-    """shortcut for the py directory"""
+    """Shortcut for the py directory."""
     return path.format(platform=PLATFORM_NAMES[platform])
 
 
 # find in python
 def list_all_files(path):
-    """clean list of all files in sub folders"""
+    """Clean list of all files in sub folders."""
     pwd = os.getcwd()
     os.chdir(path)
     liste = [
@@ -135,7 +147,7 @@ def list_all_files(path):
 
 
 def init_directories():
-    """erase and create build directories"""
+    """Erase and create build directories."""
     # create build directories
     os.makedirs(BUILD_DIR, exist_ok=True)
     os.makedirs(BUILD_DEPS, exist_ok=True)
@@ -152,24 +164,46 @@ def init_directories():
             os.unlink(zip_file)
 
 
+def write_version_to(module_local, file_tag):
+    """Write the version tag to the __version__ property of the module file."""
+    module_file = os.path.join(
+        fmt(BUNDLE_LIB_DIR),
+        os.path.relpath(module_local, MODULES_DIR),
+    )
+    with open(module_file, "r") as fp:
+        data = fp.read()
+    if "__version__" in data:
+        data = data.replace(
+            '\n__version__ = "0.0.0-auto.0"\n',
+            SET_VERSION_PATTERN.format(file_tag),
+        )
+        with open(module_file, "w") as fp:
+            fp.write(data)
+
+
 def make_bundle_files():
-    """create the .py bundle directory"""
+    """Create the .py bundle directory."""
     # copy all the layouts and keycodes
     shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
 
     # change the version number of all the bundles
-    for module_local in list_all_files(MODULES_DIR):
-        module_file = os.path.join(fmt(BUNDLE_LIB_DIR), module_local)
-        file_tag = file_version_tag(os.path.join(MODULES_DIR, module_local))
-        with open(module_file, "r") as fp:
-            data = fp.read()
-        if "__version__" in data:
-            data = data.replace(
-                '\n__version__ = "0.0.0-auto.0"\n',
-                SET_VERSION_PATTERN.format(file_tag),
-            )
-            with open(module_file, "w") as fp:
-                fp.write(data)
+    for module_local in glob.glob(MODULES_DIR + "/*"):
+        if os.path.isdir(module_local):
+            # get all versions
+            versions = []
+            for sub_module in list_all_files(module_local):
+                sub_local_file = os.path.join(module_local, sub_module)
+                file_tag = file_version_tag(sub_local_file)
+                versions.append(semver.VersionInfo.parse(file_tag))
+            # keep the highest one
+            file_tag = max(versions)
+            # set all versions
+            for sub_module in list_all_files(module_local):
+                sub_local_file = os.path.join(module_local, sub_module)
+                write_version_to(sub_local_file, file_tag)
+        elif module_local.endswith(".py"):
+            file_tag = file_version_tag(module_local)
+            write_version_to(module_local, file_tag)
 
     # list of the modules
     all_modules = [
@@ -200,7 +234,7 @@ def make_bundle_files():
         # add the dependency to keyboard_layout
         if module.startswith("keyboard_layout_"):
             json_data[module]["dependencies"].append("keyboard_layout")
-            with open(target,"a") as fp:
+            with open(target, "a") as fp:
                 fp.write("\r\nkeyboard_layout\r\n")
 
     # create the json file
@@ -209,7 +243,7 @@ def make_bundle_files():
 
 
 def make_the_mpy_bundles():
-    """create the mpy bundle(s) directory(ies) and mpy-cross the modules"""
+    """Create the mpy bundle(s) directory(ies) and mpy-cross the modules."""
     # copy for the zips
     shutil.copy(BUNDLE_JSON, fmt(BUNDLE_ZIP_JSON))
 
@@ -238,7 +272,7 @@ def make_the_mpy_bundles():
 
 
 def do_the_zips():
-    """finally create the zip files for release"""
+    """Finally create the zip files for release."""
     # now do the zips
     for platform in ["py"] + PLATFORMS:
         in_path = BUNDLE_PATH_NAME.format(platform=PLATFORM_NAMES[platform])
