@@ -6,7 +6,7 @@ __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
 # Verbatim copy from keyboard_layout_us, only rewritten the ASCII_TO_KEYCODE table to match the Dvorak keycodes.
-class KeyboardLayoutUSDVO(KeyboardLayout):
+class KeyboardLayoutUsDvo(KeyboardLayout):
     """Map ASCII characters to appropriate keypresses on a standard US PC keyboard.
     Non-ASCII characters and most control characters will raise an exception.
     """

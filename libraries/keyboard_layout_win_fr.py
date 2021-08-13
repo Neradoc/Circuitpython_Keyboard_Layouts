@@ -17,7 +17,7 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
-class KeyboardLayoutFR(KeyboardLayout):
+class KeyboardLayoutWinFr(KeyboardLayout):
     """Map ASCII characters to appropriate keypresses on a standard FR PC keyboard.
     From https://github.com/adafruit/Adafruit_CircuitPython_HID/pull/54
     Non-ASCII characters and most control characters will raise an exception.
