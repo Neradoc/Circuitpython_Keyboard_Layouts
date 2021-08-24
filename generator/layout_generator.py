@@ -21,6 +21,7 @@ SPECIAL_KEYCODES = {
 def filter_codepoints(text):
 	return text.replace("\r","\n")
 
+DEBUG = True
 BUILD_DIR = os.path.join("_build", "generated")
 FILE_US = "keything-us.xml"
 
@@ -54,8 +55,8 @@ Scan Code to USB keycode (sc_to_kc)
 """
 
 def jprint(data):
-	print("<<< " + str(len(data)) + " >>>")
-	print(json.dumps(data, indent=2))
+	if DEBUG: print("<<< " + str(len(data)) + " >>>")
+	if DEBUG: print(json.dumps(data, indent=2))
 
 def get_name_to_keycode():
 	name_to_kc = {}
@@ -70,7 +71,7 @@ def get_name_to_keycode():
 			name = name_to_virtualkey[name]
 		name_to_kc[name] = kc
 
-	print("<<< name_to_kc : " + str(len(name_to_kc)) + " >>>")
+	if DEBUG: print("<<< name_to_kc : " + str(len(name_to_kc)) + " >>>")
 	# jprint(name_to_kc)
 	
 	return name_to_kc
@@ -121,6 +122,22 @@ def get_vk_to_sc(data):
 							text = chr(int(res["@TextCodepoints"],16))
 							text = filter_codepoints(text)
 						else:
+							if "DeadKeyTable" in res:
+								for deadres in res["DeadKeyTable"]["Result"]:
+									if deadres["@With"] == " ":
+										text = deadres["@Text"]
+										if "@With" in res:
+											if res["@With"] == "VK_NUMLOCK":
+												vk_to_sc[name]['num'] = text
+											if res["@With"] == "VK_SHIFT":
+												vk_to_sc[name]['shift'] = text
+											if res["@With"] == "VK_CONTROL VK_MENU":
+												vk_to_sc[name]['altgr'] = text
+											if res["@With"] == "VK_MENU":
+												vk_to_sc[name]['alt'] = text
+										else:
+											vk_to_sc[name]['letter'] = text
+								if DEBUG: print("DEAD", vk_to_sc[name],)
 							continue
 					else:
 						text = html.unescape(res["@Text"])
@@ -136,9 +153,9 @@ def get_vk_to_sc(data):
 					else:
 						vk_to_sc[name]['letter'] = text
 			else:
-				print("What is Result ?", kresult)
+				if DEBUG: print("What is Result ?", kresult)
 
-	print("<<< vk_to_sc : " + str(len(vk_to_sc)) + " >>>")
+	if DEBUG: print("<<< vk_to_sc : " + str(len(vk_to_sc)) + " >>>")
 	# jprint(vk_to_sc)
 
 	return vk_to_sc
@@ -179,7 +196,7 @@ def get_usb_keycodes():
 		if scancode != 0:
 			if scancode in usb_sc_to_kc:
 				old = usb_sc_to_kc[scancode]
-				print(f"{RED}Scancode is twice {scancode} > {keycode} or {old}{NOC}")
+				if DEBUG: print(f"{RED}Scancode is twice {scancode} > {keycode} or {old}{NOC}")
 			else:
 				usb_sc_to_kc[scancode] = keycode
 	return usb_sc_to_kc
@@ -210,30 +227,42 @@ def get_layout_data(virtual_key_defs_lang):
 		# scancode of the key
 		scancode = key_info["scancode"]
 	
-		# matching US keycode
+		# matching keycodes
+		keycode = None
 		if scancode in sc_to_kc:
 			keycode = sc_to_kc[scancode]
-		elif scancode in SPECIAL_KEYCODES:
-			keycode = SPECIAL_KEYCODES[scancode]
-			print(CYAN + "USB IF scancode", scancode, keycode, NOC)
-		elif scancode in usb_sc_to_kc:
-			keycode = usb_sc_to_kc[scancode]
-			print(GREEN + "USB IF scancode", scancode, keycode, NOC)
-		else:
+		if scancode in SPECIAL_KEYCODES:
+			if keycode is None:
+				keycode = SPECIAL_KEYCODES[scancode]
+				if DEBUG: print(CYAN + f"SPECIAL scancode:{scancode} > keycode:{keycode}" + NOC)
+			else:
+				if keycode != SPECIAL_KEYCODES[scancode]:
+					if DEBUG: print(RED + "Different:", keycode, SPECIAL_KEYCODES[scancode])
+		"""
+		# This does nothing good
+		if scancode in usb_sc_to_kc:
+			if keycode is None:
+				keycode = usb_sc_to_kc[scancode]
+				print(GREEN + f"USB IF scancode:{scancode} > keycode:{keycode}" + NOC)
+			else:
+				if keycode != usb_sc_to_kc[scancode]
+					print(RED + "USB Different:", keycode, usb_sc_to_kc[scancode])
+		"""
+		if keycode is None:
 			# TODO: check there's none missing
-			print(BLUE + "Unknown scancode", virtualkey, scancode)
-			print("    ", key_info, NOC)
+			if DEBUG: print(BLUE + "Unknown scancode", virtualkey, scancode)
+			if DEBUG: print("    ", key_info, NOC)
 			continue
 		# find the letter somehow
 	
 		if scancode == 0x12:
-			print("<>"*40)
+			if DEBUG: print("<>"*40)
 
 		# letter as defined in the keyboard definition
 		if "letter" in key_info:
 			letter = key_info["letter"]
 			pos = ord(letter)
-			print("L", num, pos, letter, scancode, hex(keycode))
+			if DEBUG: print("L", num, pos, letter, scancode, hex(keycode))
 			if pos < 128:
 				if not charas[pos]:
 					asciis[pos] = keycode
@@ -242,33 +271,33 @@ def get_layout_data(virtual_key_defs_lang):
 				if letter not in HIGHER_ASCII:
 					HIGHER_ASCII[letter] = keycode
 				else:
-					print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
-	
+					if DEBUG: print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
+
 		if "shift" in key_info:
 			letter = key_info["shift"]
 			pos = ord(letter)
-			print("S", num, pos, letter, scancode, hex(keycode | SHIFT_FLAG))
+			if DEBUG: print("S", num, pos, letter, scancode, hex(keycode | SHIFT_FLAG))
 			if pos < 128:
 				if letter == "+":
-					print("+", charas[pos])
+					if DEBUG: print("+", charas[pos])
 				if not charas[pos]:
 					asciis[pos] = keycode | SHIFT_FLAG
 					charas[pos] = letter
-					print("------ SHIFT ", charas[pos])
+					if DEBUG: print("------ SHIFT ", charas[pos])
 			else:
 				if letter not in HIGHER_ASCII:
 					HIGHER_ASCII[letter] = keycode | SHIFT_FLAG
 				else:
-					print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
+					if DEBUG: print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
 
 		if "altgr" in key_info:
 			letter = key_info["altgr"]
 			if letter in NEED_ALTGR:
-				print(RED+"Already in NEED_ALTGR", letter, NOC)
+				if DEBUG: print(RED+"Already in NEED_ALTGR", letter, NOC)
 			else:
 				NEED_ALTGR += letter
 			pos = ord(letter)
-			print("A", num, pos, letter, scancode, hex(keycode))
+			if DEBUG: print("A", num, pos, letter, scancode, hex(keycode))
 			if pos < 128:
 				if not charas[pos]:
 					asciis[pos] = keycode
@@ -277,14 +306,14 @@ def get_layout_data(virtual_key_defs_lang):
 				if letter not in HIGHER_ASCII:
 					HIGHER_ASCII[letter] = keycode
 				else:
-					print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
+					if DEBUG: print(RED+"double", letter, HIGHER_ASCII[letter], NOC)
 
 		if "num" in key_info:
 			letter = key_info["num"]
-			# print("NUM", key_info)
+			# if DEBUG: print("NUM", key_info)
 	
 		if letter == "+":
-			print("--- LETTER IS + ------------------------------------")
+			if DEBUG: print("--- LETTER IS + ------------------------------------")
 	
 	return LayoutData(
 		asciis,
@@ -297,7 +326,7 @@ def get_layout_data(virtual_key_defs_lang):
 def make_output_file(output_file, layout_data, platform, lang):
 	output_file_data = (
 		"from keyboard_layout import KeyboardLayout\n"
-		"class KeyboardLayout{platform.title()}{lang.title()}(KeyboardLayout):\n"
+		+ f"class KeyboardLayout{platform.title()}{lang.title()}(KeyboardLayout):\n"
 		"    ASCII_TO_KEYCODE = (\n"
 	)
 	for x in range(128):
@@ -323,6 +352,8 @@ def compare_lang(layout_data, lang="fr"):
 		from keyboard_layout_win_fr import KeyboardLayoutWinFr as KeyboardLayoutLang
 	elif lang == "de":
 		from keyboard_layout_win_de_de import KeyboardLayoutWinDeDe as KeyboardLayoutLang
+	else:
+		return
 	for x in range(128):
 		this = layout_data.asciis[x]
 		ref = KeyboardLayoutLang.ASCII_TO_KEYCODE[x]
@@ -344,28 +375,33 @@ def compare_lang(layout_data, lang="fr"):
 @click.option("--file", "-f", required=True)
 @click.option("--lang", "-l", default="")
 @click.option("--platform", "-p", default="win")
-@click.option("--output", "-o", default="")
-def main(file, lang, platform, output):
+@click.option("--output", "-o", is_flag=True)
+@click.option("--output-file", default="")
+@click.option("--debug/--no-debug", "-d", is_flag=True)
+def main(file, lang, platform, output, output_file, debug):
+	global DEBUG
+	DEBUG = debug
 	if not platform:
 		platform = "Win"
 	if not lang:
 		lang = file.split('.')[0].split('_')[-1].split('-')[-1]
 	# file = FILE_INTERNATIONAL
-	print(">", file)
-	print(">", platform)
-	print(">", lang)
+	if DEBUG:
+		print(">", file)
+		print(">", platform)
+		print(">", lang)
 	with open(file, "r") as fp:
 		data = fp.read()
 	virtual_key_defs_lang = get_vk_to_sc(data)
 	layout_data = get_layout_data(virtual_key_defs_lang)
-	if lang == "fr":
-		compare_fr(layout_data)
-	if output == "":
+	if DEBUG:
+		compare_lang(layout_data, lang)
+	if output or output_file:
 		os.makedirs(BUILD_DIR, exist_ok=True)
-		output_file = os.path.join(BUILD_DIR, f"test_keyboard_layout_{platform.lower()}_{lang.lower()}.py")
-	else:
-		output_file = output
-	make_output_file(output_file, layout_data, platform, lang)
+		if not output_file:
+			output_file = os.path.join(BUILD_DIR, f"test_keyboard_layout_{platform.lower()}_{lang.lower()}.py")
+		print(CYAN + f"Write to {output_file}" + NOC)
+		make_output_file(output_file, layout_data, platform, lang)
 
 if __name__ == "__main__":
 	main()
