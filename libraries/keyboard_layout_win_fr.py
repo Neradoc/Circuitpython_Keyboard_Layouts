@@ -70,17 +70,17 @@ class KeyboardLayoutWinFr(KeyboardLayout):
         b"\x00"  # RS
         b"\x00"  # US
         b"\x2c"  # SPACE
-        b"\x38"  # ! x1e|SHIFT_FLAG (shift 1)
-        b"\x20"  # " x34|SHIFT_FLAG (shift ')
-        b"\xe0"  # # x20|SHIFT_FLAG (shift 3)
-        b"\x30"  # $ x21|SHIFT_FLAG (shift 4)
-        b"\xb4"  # % x22|SHIFT_FLAG (shift 5)
-        b"\x1e"  # & x24|SHIFT_FLAG (shift 7)
+        b"\x38"  # !
+        b"\x20"  # "
+        b"\x20"  # # (altgr ")
+        b"\x30"  # $
+        b"\xb4"  # %
+        b"\x1e"  # &
         b"\x21"  # '
-        b"\x22"  # ( x26|SHIFT_FLAG (shift 9)
-        b"\x2d"  # ) x27|SHIFT_FLAG (shift 0)
-        b"\x31"  # * x25|SHIFT_FLAG (shift 8)
-        b"\xae"  # + x2e|SHIFT_FLAG (shift =)
+        b"\x22"  # (
+        b"\x2d"  # )
+        b"\x31"  # *
+        b"\xae"  # +
         b"\x10"  # ,
         b"\x23"  # -
         b"\xb6"  # .
@@ -95,44 +95,44 @@ class KeyboardLayoutWinFr(KeyboardLayout):
         b"\xa4"  # 7 (SHIFT_FLAG)
         b"\xa5"  # 8 (SHIFT_FLAG)
         b"\xa6"  # 9 (SHIFT_FLAG)
-        b"\x37"  # : x33|SHIFT_FLAG (shift ;)
+        b"\x37"  # :
         b"\x36"  # ;
-        b"\x64"  # < x36|SHIFT_FLAG (shift ,)
+        b"\x64"  # <
         b"\x2e"  # =
-        b"\x03"  # > x37|SHIFT_FLAG (shift .)
-        b"\x90"  # ? x38|SHIFT_FLAG (shift /)
-        b"\x27"  # @ x1f|SHIFT_FLAG (shift 2)
-        b"\x94"  # A x04|SHIFT_FLAG (shift a)
-        b"\x85"  # B x05|SHIFT_FLAG (etc.)
-        b"\x86"  # C x06|SHIFT_FLAG
-        b"\x87"  # D x07|SHIFT_FLAG
-        b"\x88"  # E x08|SHIFT_FLAG
-        b"\x89"  # F x09|SHIFT_FLAG
-        b"\x8a"  # G x0a|SHIFT_FLAG
-        b"\x8b"  # H x0b|SHIFT_FLAG
-        b"\x8c"  # I x0c|SHIFT_FLAG
-        b"\x8d"  # J x0d|SHIFT_FLAG
-        b"\x8e"  # K x0e|SHIFT_FLAG
-        b"\x8f"  # L x0f|SHIFT_FLAG
-        b"\xb3"  # M x10|SHIFT_FLAG
-        b"\x91"  # N x11|SHIFT_FLAG
-        b"\x92"  # O x12|SHIFT_FLAG
-        b"\x93"  # P x13|SHIFT_FLAG
-        b"\x84"  # Q x14|SHIFT_FLAG
-        b"\x95"  # R x15|SHIFT_FLAG
-        b"\x96"  # S x16|SHIFT_FLAG
-        b"\x97"  # T x17|SHIFT_FLAG
-        b"\x98"  # U x18|SHIFT_FLAG
-        b"\x99"  # V x19|SHIFT_FLAG
-        b"\x9d"  # W x1a|SHIFT_FLAG
-        b"\x9b"  # X x1b|SHIFT_FLAG
-        b"\x9c"  # Y x1c|SHIFT_FLAG
-        b"\x9a"  # Z x1d|SHIFT_FLAG
+        b"\xe4"  # >
+        b"\x90"  # ? (shift ,)
+        b"\x27"  # @ (altgr à)
+        b"\x94"  # A
+        b"\x85"  # B
+        b"\x86"  # C
+        b"\x87"  # D
+        b"\x88"  # E
+        b"\x89"  # F
+        b"\x8a"  # G
+        b"\x8b"  # H
+        b"\x8c"  # I
+        b"\x8d"  # J
+        b"\x8e"  # K
+        b"\x8f"  # L
+        b"\xb3"  # M
+        b"\x91"  # N
+        b"\x92"  # O
+        b"\x93"  # P
+        b"\x84"  # Q
+        b"\x95"  # R
+        b"\x96"  # S
+        b"\x97"  # T
+        b"\x98"  # U
+        b"\x99"  # V
+        b"\x9d"  # W
+        b"\x9b"  # X
+        b"\x9c"  # Y
+        b"\x9a"  # Z
         b"\x22"  # [
         b"\x25"  # \ backslash
         b"\x2d"  # ]
-        b"\x26"  # ^ x23|SHIFT_FLAG (shift 6)
-        b"\x25"  # _ x2d|SHIFT_FLAG (shift -)
+        b"\x26"  # ^
+        b"\x25"  # _
         b"\x24"  # `
         b"\x14"  # a
         b"\x05"  # b
@@ -167,14 +167,19 @@ class KeyboardLayoutWinFr(KeyboardLayout):
         b"\x4c"  # DEL DELETE (called Forward Delete in usb.org document)
     )
 
-    NEED_ALTGR = "~{[|`\\^@]}€"
+    NEED_ALTGR = "#{[|\\^@]}€¤~`"
     HIGHER_ASCII = {
-        "à": 0x27,  # à
-        "ç": 0x26,  # ç
-        "è": 0x24,  # è
-        "é": 0x1F,  # é
-        "ù": 0x34,  # ù
         "€": 0x08,  # € - altgr will be added thanks to NEED_ALTGR
-        "°": 0xAD,  # °
+        'é': 0x1f,
+        'è': 0x24,
+        'ç': 0x26,
+        'à': 0x27,
+        '°': 0xad,
+        '£': 0xb0,
+        '¤': 0xb0,
+        'ù': 0x34,
+        '²': 0x35,
+        'µ': 0xb1,
+        '§': 0xb8,
         #  TODO: add missing ÀÈÉÙ
     }
