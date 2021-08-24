@@ -52,7 +52,6 @@ def date_to_version(tag):
 # TODO: give each file a different version number possibly
 #       (that of the latest released change if possible)
 TAG = get_current_version() or datetime.date.today().strftime("%Y%m%d")
-VERSION_NUMBER = date_to_version(TAG)
 # the dirs for putting the things in it
 BUILD_DIR = "_build"
 BUILD_DEPS = os.path.join(BUILD_DIR, "deps")
@@ -111,19 +110,37 @@ def file_version_tag(path):
     """
     Find a suitable version tag for a file using commit dates.
     """
-    hash = get_git_command(["git", "log", "-1", "--pretty=%H", path])
-    # ptag = get_git_command(["git", "describe", "--tags", "--always", hash])
-    # pdate = re.split(r"[~-]", ptag)[0]
-    ctag = get_git_command(
-        ["git", "describe", "--tags", "--always", "--contains", hash]
-    )
-    cdate = re.split(r"[~-]", ctag)[0]
-    if "." in cdate:
-        ver = cdate
-    elif hash.startswith(cdate):
-        ver = date_to_version(TAG)
-    else:
-        ver = date_to_version(cdate[0:8])
+    logs = get_git_command(["git", "log", "--pretty=%H", path])
+    num_commits = len(logs.split("\n"))
+    #
+    major = 0
+    minor = num_commits // 10
+    patch = num_commits % 10
+    #
+    with open(path, "r") as fp:
+        data = fp.read()
+        m = re.search(r'__version__ = ["\']([0-9.]+)-auto\.0["\']', data)
+        if m:
+            file_version = semver.VersionInfo.parse(m.group(1))
+            #
+            line = len(data.split("__version__")[0].split("\n"))
+            vtag = get_git_command(["git", "blame", "-L", f"{line},{line}", path]).split(" ")[0]
+            logs = get_git_command(["git", "log", "--pretty=%H", f"--after={vtag}", path]).split("\n")
+            print(f"{vtag} {line:2d} {num_commits:2d} {len(logs):2d} {path}")
+            #
+            if file_version.major:
+                major = file_version.major
+                num_commits = len(logs)
+                minor = num_commits // 10
+                patch = num_commits % 10
+            if file_version.minor:
+                minor = file_version.minor
+                num_commits = len(logs)
+                patch = num_commits
+            # if file_version.patch:
+            #     patch = file_version.patch
+    #
+    ver = f"{major}.{minor}.{patch}"
     return ver
 
 
@@ -173,9 +190,10 @@ def write_version_to(module_local, file_tag):
     with open(module_file, "r") as fp:
         data = fp.read()
     if "__version__" in data:
-        data = data.replace(
-            '\n__version__ = "0.0.0-auto.0"\n',
+        data = re.sub(
+            r'\n__version__ = ["\']([0-9.]+)-auto\.0["\']\n',
             SET_VERSION_PATTERN.format(file_tag),
+            data,
         )
         with open(module_file, "w") as fp:
             fp.write(data)
@@ -186,8 +204,10 @@ def make_bundle_files():
     # copy all the layouts and keycodes
     shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
 
+    module_versions = {}
     # change the version number of all the bundles
     for module_local in glob.glob(MODULES_DIR + "/*"):
+        module_name = os.path.basename(module_local).replace(".py","")
         if os.path.isdir(module_local):
             # get all versions
             versions = []
@@ -201,9 +221,11 @@ def make_bundle_files():
             for sub_module in list_all_files(module_local):
                 sub_local_file = os.path.join(module_local, sub_module)
                 write_version_to(sub_local_file, file_tag)
+            module_versions[module_name] = file_tag
         elif module_local.endswith(".py"):
             file_tag = file_version_tag(module_local)
             write_version_to(module_local, file_tag)
+            module_versions[module_name] = file_tag
 
     # list of the modules
     all_modules = [
@@ -225,7 +247,7 @@ def make_bundle_files():
         json_data[module] = {
             "package": False,
             "pypi_name": "",
-            "version": VERSION_NUMBER,
+            "version": module_versions[module],
             "repo": THIS_REPOSITORY,
             "path": "lib/" + module,
             "dependencies": [],  # "adafruit_hid"
