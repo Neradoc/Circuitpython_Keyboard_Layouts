@@ -1,4 +1,5 @@
+click
+natsort
 requests
 semver
-click
 xmltodict

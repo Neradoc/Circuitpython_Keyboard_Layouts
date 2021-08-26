@@ -1,5 +1,6 @@
 import html
 import json
+import natsort
 import os
 import pprint
 
@@ -18,10 +19,14 @@ SPECIAL_KEYCODES = {
     0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
 }
 
-
-def filter_codepoints(text):
-    return text.replace("\r", "\n")
-
+COMMON_HEADER_COPYRIGHT = """
+# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
+#
+# SPDX-License-Identifier: MIT
+\"\"\"
+This file was automatically generated using Circuitpython_Keyboard_Layouts
+\"\"\"
+"""
 
 DEBUG = True
 BUILD_DIR = os.path.join("_build", "generated")
@@ -57,11 +62,32 @@ Scan Code to USB keycode (sc_to_kc)
 """
 
 
+def filter_codepoints(text):
+    return text.replace("\r", "\n")
+
+
 def jprint(data):
     if DEBUG:
         print("<<< " + str(len(data)) + " >>>")
     if DEBUG:
         print(json.dumps(data, indent=2))
+
+
+virtualkey_to_keyname = {}
+for name, vkey in name_to_virtualkey.items():
+    if vkey not in virtualkey_to_keyname:
+        virtualkey_to_keyname[vkey] = []
+    virtualkey_to_keyname[vkey].append(name)
+
+
+def list_keycode_name(key, value):
+    output = []
+    if key in virtualkey_to_keyname:
+        for name in virtualkey_to_keyname[key]:
+            output.append( (name, value) )
+    else:
+        output = [(key, value)]
+    return output
 
 
 def get_name_to_keycode():
@@ -223,11 +249,12 @@ def get_usb_keycodes():
 
 
 class LayoutData:
-    def __init__(self, asciis, charas, altgr, high):
+    def __init__(self, asciis, charas, altgr, high, keycodes):
         self.asciis = asciis
         self.charas = charas
         self.altgr = altgr
         self.high = high
+        self.keycodes = keycodes
 
 
 def get_layout_data(virtual_key_defs_lang):
@@ -239,6 +266,8 @@ def get_layout_data(virtual_key_defs_lang):
 
     sc_to_kc = get_scancode_to_keycode()
     usb_sc_to_kc = get_usb_keycodes()
+
+    KEYCODES = {}
 
     # loop the list of virtual keycodes that exist in the language
     for num, virtualkey in enumerate(virtual_key_defs_lang):
@@ -263,15 +292,15 @@ def get_layout_data(virtual_key_defs_lang):
                     if DEBUG:
                         print(RED + "Different:", keycode, SPECIAL_KEYCODES[scancode])
         """
-		# This does nothing good
-		if scancode in usb_sc_to_kc:
-			if keycode is None:
-				keycode = usb_sc_to_kc[scancode]
-				print(GREEN + f"USB IF scancode:{scancode} > keycode:{keycode}" + NOC)
-			else:
-				if keycode != usb_sc_to_kc[scancode]
-					print(RED + "USB Different:", keycode, usb_sc_to_kc[scancode])
-		"""
+        # This does nothing good
+        if scancode in usb_sc_to_kc:
+            if keycode is None:
+                keycode = usb_sc_to_kc[scancode]
+                print(GREEN + f"USB IF scancode:{scancode} > keycode:{keycode}" + NOC)
+            else:
+                if keycode != usb_sc_to_kc[scancode]
+                    print(RED + "USB Different:", keycode, usb_sc_to_kc[scancode])
+        """
         if keycode is None:
             # TODO: check there's none missing
             if DEBUG:
@@ -279,12 +308,11 @@ def get_layout_data(virtual_key_defs_lang):
             if DEBUG:
                 print("    ", key_info, NOC)
             continue
+
+        KEYCODES.update(list_keycode_name(virtualkey, keycode))
+        # KEYCODES[virtualkey] = keycode
+
         # find the letter somehow
-
-        if scancode == 0x12:
-            if DEBUG:
-                print("<>" * 40)
-
         # letter as defined in the keyboard definition
         if "letter" in key_info:
             letter = key_info["letter"]
@@ -295,9 +323,13 @@ def get_layout_data(virtual_key_defs_lang):
                 if not charas[pos]:
                     asciis[pos] = keycode
                     charas[pos] = letter
+                    KEYCODES.update(list_keycode_name(virtualkey, keycode))
+                    # KEYCODES[virtualkey] = keycode
             else:
                 if letter not in HIGHER_ASCII:
                     HIGHER_ASCII[letter] = keycode
+                    KEYCODES.update(list_keycode_name(virtualkey, keycode))
+                    # KEYCODES[virtualkey] = keycode
                 else:
                     if DEBUG:
                         print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
@@ -352,17 +384,22 @@ def get_layout_data(virtual_key_defs_lang):
             if DEBUG:
                 print("--- LETTER IS + ------------------------------------")
 
+    print(json.dumps(KEYCODES, indent=2))
+    print(f"--- {len(KEYCODES)} ---")
+
     return LayoutData(
         asciis,
         charas,
         NEED_ALTGR,
         HIGHER_ASCII,
+        KEYCODES
     )
 
 
-def make_output_file(output_file, layout_data, platform, lang):
+def output_layout_file(output_file, layout_data, platform, lang):
     output_file_data = (
-        "from keyboard_layout import KeyboardLayout\n"
+        COMMON_HEADER_COPYRIGHT
+        + "from keyboard_layout import KeyboardLayout\n"
         + f"class KeyboardLayout{platform.title()}{lang.title()}(KeyboardLayout):\n"
         "    ASCII_TO_KEYCODE = (\n"
     )
@@ -378,6 +415,34 @@ def make_output_file(output_file, layout_data, platform, lang):
     for k, c in layout_data.high.items():
         output_file_data += f"        {repr(k)}: 0x{c:02x},\n"
     output_file_data += "    }\n"
+
+    with open(output_file, "w") as fp:
+        fp.write(output_file_data)
+
+
+def output_keycode_file(output_file, layout_data, platform, lang):
+    output_file_data = (
+        COMMON_HEADER_COPYRIGHT + "class Keycode:\n"
+    )
+    def ck(x):
+        l = x[0]
+        if len(l) == 2:
+            l = l + " "
+        if len(l) > 5:
+            l = l.ljust(20)
+        return (len(l), l)
+    for name,code in natsort.natsorted(layout_data.keycodes.items(), key=ck):
+        # code = layout_data.keycodes[name]
+        output_file_data += f"    {name} = 0x{code:02x}\n"
+    output_file_data += """
+    @classmethod
+    def modifier_bit(cls, keycode):
+        \"""Return the modifer bit to be set in an HID keycode report if this is a
+        modifier key; otherwise return 0.\"""
+        return (
+            1 << (keycode - 0xE0) if cls.LEFT_CONTROL <= keycode <= cls.RIGHT_GUI else 0
+        )
+    """
 
     with open(output_file, "w") as fp:
         fp.write(output_file_data)
@@ -418,9 +483,10 @@ def compare_lang(layout_data, lang="fr"):
 @click.option("--lang", "-l", default="")
 @click.option("--platform", "-p", default="win")
 @click.option("--output", "-o", is_flag=True)
-@click.option("--output-file", default="")
+@click.option("--output-layout", default="")
+@click.option("--output-keycode", default="")
 @click.option("--debug/--no-debug", "-d", is_flag=True)
-def main(file, lang, platform, output, output_file, debug):
+def main(file, lang, platform, output, output_layout, output_keycode, debug):
     global DEBUG
     DEBUG = debug
     if not platform:
@@ -438,14 +504,22 @@ def main(file, lang, platform, output, output_file, debug):
     layout_data = get_layout_data(virtual_key_defs_lang)
     if DEBUG:
         compare_lang(layout_data, lang)
-    if output or output_file:
+    if output or output_layout:
         os.makedirs(BUILD_DIR, exist_ok=True)
-        if not output_file:
-            output_file = os.path.join(
-                BUILD_DIR, f"test_keyboard_layout_{platform.lower()}_{lang.lower()}.py"
+        if not output_layout:
+            output_layout = os.path.join(
+                BUILD_DIR, f"keyboard_layout_{platform.lower()}_{lang.lower()}.py"
             )
-        print(CYAN + f"Write to {output_file}" + NOC)
-        make_output_file(output_file, layout_data, platform, lang)
+        print(CYAN + f"Write to {output_layout}" + NOC)
+        output_layout_file(output_layout, layout_data, platform, lang)
+    if output or output_keycode:
+        os.makedirs(BUILD_DIR, exist_ok=True)
+        if not output_keycode:
+            output_keycode = os.path.join(
+                BUILD_DIR, f"keycode_{platform.lower()}_{lang.lower()}.py"
+            )
+        print(CYAN + f"Write to {output_keycode}" + NOC)
+        output_keycode_file(output_keycode, layout_data, platform, lang)
 
 
 if __name__ == "__main__":
