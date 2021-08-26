@@ -1,4 +1,4 @@
-_build*/
+_*/
 .env
 venv
 .DS_Store
