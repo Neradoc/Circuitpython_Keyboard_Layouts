@@ -111,8 +111,9 @@ class KeyboardLayout:
             return self.HIGHER_ASCII[ord(char)]
 
         raise ValueError(
-            "Unsupported non-ASCII character {letter} ({num}/0x{num:02x})."
-            .format(letter=str(char), num=ord(char))
+            "Unsupported non-ASCII character {letter} ({num}/0x{num:02x}).".format(
+                letter=str(char), num=ord(char)
+            )
         )
 
     def _char_to_keycode(self, char):
@@ -127,7 +128,8 @@ class KeyboardLayout:
         keycode = self.ASCII_TO_KEYCODE[char_val]
         if keycode == 0:
             raise ValueError(
-                "No keycode available for character {letter} ({num}/0x{num:02x})."
-                .format(letter=str(char), num=char_val)
+                "No keycode available for character {letter} ({num}/0x{num:02x}).".format(
+                    letter=str(char), num=char_val
+                )
             )
         return keycode

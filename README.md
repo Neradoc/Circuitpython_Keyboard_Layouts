@@ -10,17 +10,18 @@ circup install keyboard_layout_win_fr
 
 ### Layouts
 
-`keyboard_layout_<platform>_<lang>` modules will contain the layout information for use with the `Keyboard` to type text.
+For the plaform **platform** (win, mac) and the layout language **lang**.
+The module `keyboard_layout_platform_lang` has a class called `KeyboardLayoutPlatformLang` (the CamelCase version of the module's name). It contains the layout information for use with the `Keyboard` to type text.
 
-They require also installing the `keyboard_layout.py` file, containing the base class and methods that are used by the layout. This file should be part of adafruit_hid in the future and will be removed.
+They require also installing the `keyboard_layout` module (`keyboard_layout.mpy` in the bundle zip), containing the base class for the layout. This file should be part of adafruit_hid in the future and will then be removed.
 
 ```py
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
-from keyboard_layout_win_fr import KeyboardLayoutFR
+from keyboard_layout_win_fr import KeyboardLayoutWinFr
 keyboard = Keyboard(usb_hid.devices)
-keyboard_fr = KeyboardLayoutFR(keyboard)
-keyboard_fr.write("Bonjour le monde")
+layout = KeyboardLayoutWinFr(keyboard)
+layout.write("Bonjour le monde")
 ```
 
 ### Keycodes
