@@ -6,10 +6,8 @@ import pprint
 
 import click
 import xmltodict
-from .keycode_names import keycode_names
 from .keycode_name_to_virtualkey import name_to_virtualkey
 from .keycode_us_ref import Keycode
-from .usbif_keycode_scancode import usbif_keycode_scancode
 from .virtualkey_table_us import VIRTUAL_KEY_US
 
 # scancode / keycode
@@ -230,24 +228,6 @@ NUMPAD is particularly missing (it's refed as arrows, page up, etc.)
 ########################################################################
 
 
-def get_usb_keycodes():
-    usb_sc_to_kc = {}
-    for (keycode, scancode, note) in usbif_keycode_scancode:
-        if scancode != 0:
-            if scancode in usb_sc_to_kc:
-                old = usb_sc_to_kc[scancode]
-                if DEBUG:
-                    print(
-                        f"{RED}Scancode is twice {scancode} > {keycode} or {old}{NOC}"
-                    )
-            else:
-                usb_sc_to_kc[scancode] = keycode
-    return usb_sc_to_kc
-
-
-########################################################################
-
-
 class LayoutData:
     def __init__(self, asciis, charas, altgr, high, keycodes):
         self.asciis = asciis
@@ -264,8 +244,7 @@ def get_layout_data(virtual_key_defs_lang):
     NEED_ALTGR = ""
     HIGHER_ASCII = {}
 
-    sc_to_kc = get_scancode_to_keycode()
-    usb_sc_to_kc = get_usb_keycodes()
+    scancode_to_keycode = get_scancode_to_keycode()
 
     KEYCODES = {}
 
@@ -278,8 +257,8 @@ def get_layout_data(virtual_key_defs_lang):
 
         # matching keycodes
         keycode = None
-        if scancode in sc_to_kc:
-            keycode = sc_to_kc[scancode]
+        if scancode in scancode_to_keycode:
+            keycode = scancode_to_keycode[scancode]
         if scancode in SPECIAL_KEYCODES:
             if keycode is None:
                 keycode = SPECIAL_KEYCODES[scancode]
@@ -291,16 +270,6 @@ def get_layout_data(virtual_key_defs_lang):
                 if keycode != SPECIAL_KEYCODES[scancode]:
                     if DEBUG:
                         print(RED + "Different:", keycode, SPECIAL_KEYCODES[scancode])
-        """
-        # This does nothing good
-        if scancode in usb_sc_to_kc:
-            if keycode is None:
-                keycode = usb_sc_to_kc[scancode]
-                print(GREEN + f"USB IF scancode:{scancode} > keycode:{keycode}" + NOC)
-            else:
-                if keycode != usb_sc_to_kc[scancode]
-                    print(RED + "USB Different:", keycode, usb_sc_to_kc[scancode])
-        """
         if keycode is None:
             # TODO: check there's none missing
             if DEBUG:
@@ -384,8 +353,9 @@ def get_layout_data(virtual_key_defs_lang):
             if DEBUG:
                 print("--- LETTER IS + ------------------------------------")
 
-    print(json.dumps(KEYCODES, indent=2))
-    print(f"--- {len(KEYCODES)} ---")
+    if DEBUG:
+        print(json.dumps(KEYCODES, indent=2))
+        print(f"--- {len(KEYCODES)} ---")
 
     return LayoutData(
         asciis,
