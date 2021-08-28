@@ -119,6 +119,19 @@ def get_vk_to_sc(data):
             "scancode": sckey,
         }
         #
+        def set_res(vk_to_sc, kname, text):
+            if "@With" in res:
+                if res["@With"] == "VK_NUMLOCK":
+                    vk_to_sc[kname]["numpad"] = text
+                if res["@With"] == "VK_SHIFT":
+                    vk_to_sc[kname]["shift"] = text
+                if res["@With"] == "VK_CONTROL VK_MENU":
+                    vk_to_sc[kname]["altgr"] = text
+                if res["@With"] == "VK_MENU":
+                    vk_to_sc[kname]["alt"] = text
+            else:
+                vk_to_sc[kname]["letter"] = text
+        #
         if "Result" in key:
             kresult = key["Result"]
             if isinstance(kresult, dict):
@@ -131,17 +144,7 @@ def get_vk_to_sc(data):
                             "scancode": sckey,
                         }
                         text = html.unescape(res["@Text"])
-                        if "@With" in res:
-                            if res["@With"] == "VK_NUMLOCK":
-                                vk_to_sc[kname]["num"] = text
-                            if res["@With"] == "VK_SHIFT":
-                                vk_to_sc[kname]["shift"] = text
-                            if res["@With"] == "VK_CONTROL VK_MENU":
-                                vk_to_sc[kname]["altgr"] = text
-                            if res["@With"] == "VK_MENU":
-                                vk_to_sc[kname]["alt"] = text
-                        else:
-                            vk_to_sc[kname]["letter"] = text
+                        set_res(vk_to_sc, kname, text)
                         continue
                     # print("-", res)
                     # VK_NUMLOCK VK_SHIFT VK_MENU
@@ -155,17 +158,11 @@ def get_vk_to_sc(data):
                                 for deadres in res["DeadKeyTable"]["Result"]:
                                     if deadres["@With"] == " ":
                                         text = deadres["@Text"]
-                                        if "@With" in res:
-                                            if res["@With"] == "VK_NUMLOCK":
-                                                vk_to_sc[name]["num"] = text
-                                            if res["@With"] == "VK_SHIFT":
-                                                vk_to_sc[name]["shift"] = text
-                                            if res["@With"] == "VK_CONTROL VK_MENU":
-                                                vk_to_sc[name]["altgr"] = text
-                                            if res["@With"] == "VK_MENU":
-                                                vk_to_sc[name]["alt"] = text
-                                        else:
-                                            vk_to_sc[name]["letter"] = text
+                                        set_res(vk_to_sc, name, text)
+                                    else:
+                                        # TODO: multi-keys dead keys ?
+                                        # set_res(vk_to_sc, name, text)
+                                        pass
                                 if DEBUG:
                                     print(
                                         "DEAD",
@@ -174,17 +171,7 @@ def get_vk_to_sc(data):
                             continue
                     else:
                         text = html.unescape(res["@Text"])
-                    if "@With" in res:
-                        if res["@With"] == "VK_NUMLOCK":
-                            vk_to_sc[name]["num"] = text
-                        if res["@With"] == "VK_SHIFT":
-                            vk_to_sc[name]["shift"] = text
-                        if res["@With"] == "VK_CONTROL VK_MENU":
-                            vk_to_sc[name]["altgr"] = text
-                        if res["@With"] == "VK_MENU":
-                            vk_to_sc[name]["alt"] = text
-                    else:
-                        vk_to_sc[name]["letter"] = text
+                    set_res(vk_to_sc, name, text)
             else:
                 if DEBUG:
                     print("What is Result ?", kresult)
@@ -274,7 +261,6 @@ def get_layout_data(virtual_key_defs_lang):
             # TODO: check there's none missing
             if DEBUG:
                 print(BLUE + "Unknown scancode", virtualkey, scancode)
-            if DEBUG:
                 print("    ", key_info, NOC)
             continue
 
@@ -345,9 +331,9 @@ def get_layout_data(virtual_key_defs_lang):
                     if DEBUG:
                         print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
 
-        if "num" in key_info:
-            letter = key_info["num"]
-            # if DEBUG: print("NUM", key_info)
+        if "numpad" in key_info:
+            letter = key_info["numpad"]
+            if DEBUG: print("NUM", key_info)
 
         if letter == "+":
             if DEBUG:

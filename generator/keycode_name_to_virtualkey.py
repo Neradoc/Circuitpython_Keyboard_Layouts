@@ -34,6 +34,7 @@ name_to_virtualkey = {
     "RETURN": "RETURN",
     "CAPS_LOCK": "CAPITAL",
     "SPACEBAR": "SPACE",
+    "SPACE": "SPACE",  # use both
     # punctuation or stuff
     "COMMA": "OEM_COMMA",
     "PERIOD": "OEM_PERIOD",
@@ -62,17 +63,17 @@ name_to_virtualkey = {
     "UP_ARROW": "UP",
     "DOWN_ARROW": "DOWN",
     # other numpad
-    # "KEYPAD_ONE": "NUMPAD1",
-    # "KEYPAD_TWO": "NUMPAD2",
-    # "KEYPAD_THREE": "NUMPAD3",
-    # "KEYPAD_FOUR": "NUMPAD4",
-    # "KEYPAD_FIVE": "NUMPAD5",
-    # "KEYPAD_SIX": "NUMPAD6",
-    # "KEYPAD_SEVEN": "NUMPAD7",
-    # "KEYPAD_EIGHT": "NUMPAD8",
-    # "KEYPAD_NINE": "NUMPAD9",
-    # "KEYPAD_ZERO": "NUMPAD0",
-    # "KEYPAD_PERIOD": "DECIMAL",
+    "KEYPAD_ONE": "NUMPAD1",
+    "KEYPAD_TWO": "NUMPAD2",
+    "KEYPAD_THREE": "NUMPAD3",
+    "KEYPAD_FOUR": "NUMPAD4",
+    "KEYPAD_FIVE": "NUMPAD5",
+    "KEYPAD_SIX": "NUMPAD6",
+    "KEYPAD_SEVEN": "NUMPAD7",
+    "KEYPAD_EIGHT": "NUMPAD8",
+    "KEYPAD_NINE": "NUMPAD9",
+    "KEYPAD_ZERO": "NUMPAD0",
+    "KEYPAD_PERIOD": "DECIMAL",
     # 'POUND': no US
     # 'POWER': mac ?
 }
