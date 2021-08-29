@@ -43,46 +43,30 @@ def load_module(file, name):
 
 @click.group(invoke_without_command=True)
 @click.argument("keycodes", nargs=2)
-def main(keycodes):
+@click.option("--lname", "-l", default="left")
+@click.option("--rname", "-r", default="right")
+def main(keycodes, lname, rname):
     print(keycodes)
     left = load_module(keycodes[0], "left")
     right = load_module(keycodes[1], "right")
 
-    lASCII = left.KeyboardLayout.ASCII_TO_KEYCODE
-    rASCII = right.KeyboardLayout.ASCII_TO_KEYCODE
+    lnames = set(dir(left.Keycode))
+    rnames = set(dir(right.Keycode))
 
-    for x in range(len(lASCII)):
-        c = chr(x)
-        if lASCII[x] != rASCII[x]:
-            print(f"{x}/{repr(c)}: {repr(lASCII[x])} ≠ {repr(rASCII[x])}")
+    print("-"*70)
+    print(sorted(lnames - rnames))
+    print("-"*70)
+    print(sorted(rnames - lnames))
+    print("-"*70)
 
-    if left.KeyboardLayout.NEED_ALTGR != right.KeyboardLayout.NEED_ALTGR:
-        print("NEED_ALTGR")
-        print("   ", left.KeyboardLayout.NEED_ALTGR)
-        print("   ", right.KeyboardLayout.NEED_ALTGR)
-
-    lHIGH = left.KeyboardLayout.HIGHER_ASCII
-    rHIGH = right.KeyboardLayout.HIGHER_ASCII
-
-
-    for H in lHIGH:
-        if H not in rHIGH:
-            print("Only left :", repr(H), hex(lHIGH[H]))
-    for H in rHIGH:
-        if H not in lHIGH:
-            print("Only right:", repr(H), hex(rHIGH[H]))
-        elif rHIGH[H] != lHIGH[H]:
-            print("Different :", repr(H), hex(lHIGH[H]), hex(rHIGH[H]))
+    for x in lnames & rnames:
+        if x.upper() != x or x[0] == "_":
+            continue
+        lk = getattr(left.Keycode, x)
+        rk = getattr(right.Keycode, x)
+        if lk != rk:
+            print(f"{x}: {lk} ≠ {rk}")
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
