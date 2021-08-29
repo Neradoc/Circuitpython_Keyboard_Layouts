@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Make a layout</title>
+	<style type="text/css" title="text/css">
+		pre {
+			border: 4px solid blue;
+			border-radius: 16px;
+		}
+		input {
+			width: 400px;
+		}
+		#download_link { display: none; }
+		#debug_area { display: none; }
+	</style>
+	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script src="js/jszip.js"></script>
+	<script src="js/jszip-utils.js"></script>
+	<script type="text/javascript" src="src/keycode_name_to_virtualkey.js"></script>
+	<script type="text/javascript" src="src/keycode_us_ref.js"></script>
+	<script type="text/javascript" src="src/virtualkey_table_us.js"></script>
+	<script type="text/javascript" src="layout_generator.js"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+		// $(()=>{ main(); });
+	</script>
+</head>
+<body>
+
+<p>Give the URL of an XML file from <a href="https://kbdlayout.info/">kbdlayout.info</a></p>
+<ul>
+	<li>Load it with javascript.</li>
+	<li>Read it.</li>
+	<li>Generate the files.</li>
+	<li>Make a zip.</li>
+</ul>
+<p>
+	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdgr"/>
+	<button onclick="download_layout(); return false;">Make layout</button>
+</p>
+<p id="download_link"><a href="" download="">Download the zip file here</a><p>
+<div id="debug_area">
+	<pre id="debug">DEBUG</pre>
+	<h3 id="output_layout_name"></h3>
+	<pre id="output_layout_data"></pre>
+	<h3 id="output_keycode_name"></h3>
+	<pre id="output_keycode_data"></pre>
+</div>
+</body>
+</html>
