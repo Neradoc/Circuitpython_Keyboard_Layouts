@@ -11,12 +11,20 @@
 		input {
 			width: 400px;
 		}
-		input, button { font-size: inherit; }
+		input, button {
+			font-size: inherit;
+			padding: 4px 8px;
+			border-style: solid;
+			border-radius: 8px;
+		}
 		#download_link { display: none; }
 		#debug_area { display: none; }
+		#sample_code {
+			max-width: 800px;
+		}
 	</style>
 	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
-	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script src="js/jszip.js"></script>
 	<script src="js/jszip-utils.js"></script>
 	<script type="text/javascript" src="src/keycode_name_to_virtualkey.js"></script>
@@ -29,23 +37,23 @@
 </head>
 <body>
 
-<p>How to generate a Windows keyboard layout for Circuitpython's adafruit_HID (only latin ones)</p>
+<p>How to generate a Windows keyboard layout for Circuitpython's <a href="https://circuitpython.readthedocs.io/projects/hid/en/latest/">adafruit_hid</a> (only latin ones)</p>
 <p>THIS PAGE IS EXPERIMENTAL (OBVIOUSLY)</p>
 <ul>
-	<li>Go to <a href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout</li>
+	<li>Go to <a target="_BLANK" href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout.</li>
 	<li>Paste the url into this box.</li>
 	<li>Press the button.</li>
 	<li>Click the link.</li>
 	<li>Unzip the zip.</li>
 	<li>Copy the files to your boards "lib" directory.</li>
-	<li>Follow <a href="https://github.com/Neradoc/Circuitpython_Keyboard_Layouts/blob/main/README.md">the example code in the readme</a>.</li>
+	<li>Follow the example code, adapted to your file name.</li>
 	<li>Come bother me <a href="https://adafru.it/discord">on discord</a> if it doesn't work (no private messages).</li>
 </ul>
 <p>
 	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdgr"/>
 	<button onclick="download_layout(); return false;">Make layout</button>
 </p>
-<p id="download_link"><a href="" download="">Download the zip file here</a><p>
+<p>&nbsp;<a id="download_link" href="" download="">Download the zip file here</a><p>
 <div id="debug_area">
 	<pre id="debug">DEBUG</pre>
 	<h3 id="output_layout_name"></h3>
@@ -53,6 +61,6 @@
 	<h3 id="output_keycode_name"></h3>
 	<pre id="output_keycode_data"></pre>
 </div>
-<p><img src="sample_code.png"/></p>
+<p><img id="sample_code" src="js/sample_code.png"/></p>
 </body>
 </html>

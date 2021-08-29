@@ -6,19 +6,24 @@
 // var keyboard_fr_url = base_url + "/kbdfr";
 // var keyboard_fr_xml_url = keyboard_fr_url + "/download/xml";
 
-var COMMON_HEADER_COPYRIGHT = `
-# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
+var COMMON_HEADER_COPYRIGHT = (
+`# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
 #
 # SPDX-License-Identifier: MIT
 """
 This file was automatically generated using Circuitpython_Keyboard_Layouts
 """
-`
+`)
 
-var BASE_LAYOUT = "./src/keyboard_layout.py";
 // "https://raw.githubusercontent.com/Neradoc/Circuitpython_Keyboard_Layouts/main/libraries/keyboard_layout.txt"
+var BASE_LAYOUT = "./src/keyboard_layout.py";
 var BASE_LAYOUT_NAME = "keyboard_layout.py";
 var BASE_LAYOUT_DATA = "";
+
+var SAMPLE_CODE = "./src/sample_code.py";
+var SAMPLE_CODE_NAME = "sample_code.py";
+var SAMPLE_CODE_DATA = "";
+
 
 $.get(BASE_LAYOUT,
     (data) => {
@@ -29,6 +34,8 @@ $.get(BASE_LAYOUT,
     },
     "text"
 );
+$.get(SAMPLE_CODE, (data) => { SAMPLE_CODE_DATA = data; }, "text");
+
 
 SPECIAL_KEYCODES = {
     // key, shift, option, shift-option
@@ -426,6 +433,7 @@ function download_layout() {
         outputZip.file(output_layout_name, output_layout_data);
         outputZip.file(output_keycode_name, output_keycode_data);
         outputZip.file(BASE_LAYOUT_NAME, BASE_LAYOUT_DATA);
+        outputZip.file(SAMPLE_CODE_NAME, SAMPLE_CODE_DATA);
         // TODO: add keyboard_layout.py
         outputZip.generateAsync({type:"base64"}).then(function (base64) {
             zip_data = "data:application/zip;base64," + base64;
