@@ -119,7 +119,7 @@ def get_vk_to_sc(data):
             "scancode": sckey,
         }
         #
-        def set_res(vk_to_sc, kname, text):
+        def set_res(kname, text):
             if "@With" in res:
                 if res["@With"] == "VK_NUMLOCK":
                     vk_to_sc[kname]["numpad"] = text
@@ -144,7 +144,7 @@ def get_vk_to_sc(data):
                             "scancode": sckey,
                         }
                         text = html.unescape(res["@Text"])
-                        set_res(vk_to_sc, kname, text)
+                        set_res(kname, text)
                         continue
                     # print("-", res)
                     # VK_NUMLOCK VK_SHIFT VK_MENU
@@ -158,10 +158,10 @@ def get_vk_to_sc(data):
                                 for deadres in res["DeadKeyTable"]["Result"]:
                                     if deadres["@With"] == " ":
                                         text = deadres["@Text"]
-                                        set_res(vk_to_sc, name, text)
+                                        set_res(name, text)
                                     else:
                                         # TODO: multi-keys dead keys ?
-                                        # set_res(vk_to_sc, name, text)
+                                        # set_res(name, text)
                                         pass
                                 if DEBUG:
                                     print(
@@ -171,7 +171,7 @@ def get_vk_to_sc(data):
                             continue
                     else:
                         text = html.unescape(res["@Text"])
-                    set_res(vk_to_sc, name, text)
+                    set_res(name, text)
             else:
                 if DEBUG:
                     print("What is Result ?", kresult)
@@ -228,7 +228,7 @@ def get_layout_data(virtual_key_defs_lang):
     asciis = [0] * 128
     charas = [""] * 128
     SHIFT_FLAG = 0x80
-    NEED_ALTGR = ""
+    NEED_ALTGR = []
     HIGHER_ASCII = {}
 
     scancode_to_keycode = get_scancode_to_keycode()
@@ -295,9 +295,6 @@ def get_layout_data(virtual_key_defs_lang):
             if DEBUG:
                 print("S", num, pos, letter, scancode, hex(keycode | SHIFT_FLAG))
             if pos < 128:
-                if letter == "+":
-                    if DEBUG:
-                        print("+", charas[pos])
                 if not charas[pos]:
                     asciis[pos] = keycode | SHIFT_FLAG
                     charas[pos] = letter
@@ -316,7 +313,7 @@ def get_layout_data(virtual_key_defs_lang):
                 if DEBUG:
                     print(RED + "Already in NEED_ALTGR", letter, NOC)
             else:
-                NEED_ALTGR += letter
+                NEED_ALTGR.append(letter)
             pos = ord(letter)
             if DEBUG:
                 print("A", num, pos, letter, scancode, hex(keycode))
@@ -334,10 +331,6 @@ def get_layout_data(virtual_key_defs_lang):
         if "numpad" in key_info:
             letter = key_info["numpad"]
             if DEBUG: print("NUM", key_info)
-
-        if letter == "+":
-            if DEBUG:
-                print("--- LETTER IS + ------------------------------------")
 
     if DEBUG:
         print(json.dumps(KEYCODES, indent=2))
@@ -365,7 +358,7 @@ def output_layout_file(output_file, layout_data, platform, lang):
         output_file_data += f"        b'\\x{keycode:02x}'  # {repr(chara)}\n"
     output_file_data += (
         "    )\n"
-        "    NEED_ALTGR = " + repr(layout_data.altgr) + "\n"
+        "    NEED_ALTGR = " + repr("".join(sorted(layout_data.altgr))) + "\n"
         "    HIGHER_ASCII = {\n"
     )
     for k, c in layout_data.high.items():
