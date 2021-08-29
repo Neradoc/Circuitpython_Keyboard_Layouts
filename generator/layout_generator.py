@@ -349,7 +349,7 @@ def output_layout_file(output_file, layout_data, platform, lang):
     output_file_data = (
         COMMON_HEADER_COPYRIGHT
         + "from keyboard_layout import KeyboardLayout\n"
-        + f"class KeyboardLayout{platform.title()}{lang.title()}(KeyboardLayout):\n"
+        + f"class KeyboardLayout(KeyboardLayoutBase):\n"
         "    ASCII_TO_KEYCODE = (\n"
     )
     for x in range(128):

@@ -14,7 +14,7 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
-class KeyboardLayout:
+class KeyboardLayoutBase:
     """Map ASCII characters to appropriate keypresses on a standard US PC keyboard.
 
     Non-ASCII characters and most control characters will raise an exception.

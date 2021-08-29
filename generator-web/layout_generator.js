@@ -323,8 +323,8 @@ function output_layout_file(layout_data, platform, lang) {
     var class_name = "KeyboardLayout" + toTitle(platform) + toTitle(lang);
     var output_file_data = (
         COMMON_HEADER_COPYRIGHT
-        + "from keyboard_layout import KeyboardLayout\n"
-        + "class " + class_name + "(KeyboardLayout):\n"
+        + "from keyboard_layout import KeyboardLayoutBase\n"
+        + "class KeyboardLayout(KeyboardLayoutBase):\n"
         + "    ASCII_TO_KEYCODE = (\n"
     );
     for( x = 0; x < 128; ++x ) {
