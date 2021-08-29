@@ -15,6 +15,9 @@ SPECIAL_KEYCODES = {
     0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
 }
 
+import sys
+sys.path.append("libraries")
+
 DEBUG = True
 BUILD_DIR = os.path.join("_build", "generated")
 FILE_US = "keything-us.xml"
