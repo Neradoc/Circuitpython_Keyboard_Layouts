@@ -119,7 +119,7 @@ def get_vk_to_sc(data):
             "scancode": sckey,
         }
         #
-        def set_res(kname, text):
+        def set_res(res, kname, text):
             if "@With" in res:
                 if res["@With"] == "VK_NUMLOCK":
                     vk_to_sc[kname]["numpad"] = text
@@ -144,7 +144,7 @@ def get_vk_to_sc(data):
                             "scancode": sckey,
                         }
                         text = html.unescape(res["@Text"])
-                        set_res(kname, text)
+                        set_res(res, kname, text)
                         continue
                     # print("-", res)
                     # VK_NUMLOCK VK_SHIFT VK_MENU
@@ -158,7 +158,7 @@ def get_vk_to_sc(data):
                                 for deadres in res["DeadKeyTable"]["Result"]:
                                     if deadres["@With"] == " ":
                                         text = deadres["@Text"]
-                                        set_res(name, text)
+                                        set_res(res, name, text)
                                     else:
                                         # TODO: multi-keys dead keys ?
                                         # set_res(name, text)
@@ -171,7 +171,7 @@ def get_vk_to_sc(data):
                             continue
                     else:
                         text = html.unescape(res["@Text"])
-                    set_res(name, text)
+                    set_res(res, name, text)
             else:
                 if DEBUG:
                     print("What is Result ?", kresult)
@@ -348,7 +348,7 @@ def get_layout_data(virtual_key_defs_lang):
 def output_layout_file(output_file, layout_data, platform, lang):
     output_file_data = (
         COMMON_HEADER_COPYRIGHT
-        + "from keyboard_layout import KeyboardLayout\n"
+        + "from keyboard_layout import KeyboardLayoutBase\n"
         + f"class KeyboardLayout(KeyboardLayoutBase):\n"
         "    ASCII_TO_KEYCODE = (\n"
     )
