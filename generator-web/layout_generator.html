@@ -11,16 +11,32 @@
 		input {
 			width: 400px;
 		}
-		input, button {
+		input, button
+		{
 			font-size: inherit;
 			padding: 4px 8px;
 			border-style: solid;
 			border-radius: 8px;
 		}
-		#download_link { display: none; }
+		#download_block
+		{
+			padding: 0px;
+			margin: 0px;
+			min-height: calc(1em + 16px + 4px);
+		}
+		#download_link
+		{
+			display: none;
+			color: white;
+			padding: 8px;
+			width: calc(800px - 2 * 8px);
+			border-radius: 16px;
+			background-color: #531B93;
+			text-align: center;
+		}
 		#debug_area { display: none; }
 		#sample_code {
-			max-width: 800px;
+			width: 800px;
 		}
 	</style>
 	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
@@ -53,7 +69,7 @@
 	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdgr"/>
 	<button onclick="download_layout(); return false;">Make layout</button>
 </p>
-<p>&nbsp;<a id="download_link" href="" download="">Download the zip file here</a><p>
+<p id="download_block"><a id="download_link" href="" download="">Download the zip file here</a><p>
 <div id="debug_area">
 	<pre id="debug">DEBUG</pre>
 	<h3 id="output_layout_name"></h3>

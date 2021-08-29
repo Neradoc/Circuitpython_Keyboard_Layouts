@@ -12,6 +12,7 @@ var COMMON_HEADER_COPYRIGHT = (
 # SPDX-License-Identifier: MIT
 """
 This file was automatically generated using Circuitpython_Keyboard_Layouts
+From layout file at <FROM>
 """
 `)
 
@@ -326,10 +327,10 @@ function get_layout_data(virtual_key_defs_lang) {
     );
 }
 
-function output_layout_file(layout_data, platform, lang) {
+function output_layout_file(layout_data, platform, lang, from) {
     var class_name = "KeyboardLayout" + toTitle(platform) + toTitle(lang);
     var output_file_data = (
-        COMMON_HEADER_COPYRIGHT
+        COMMON_HEADER_COPYRIGHT.replace("<FROM>", from)
         + "from keyboard_layout import KeyboardLayoutBase\n"
         + "class KeyboardLayout(KeyboardLayoutBase):\n"
         + "    ASCII_TO_KEYCODE = (\n"
@@ -362,9 +363,10 @@ function output_layout_file(layout_data, platform, lang) {
     return output_file_data;
 }
 
-function output_keycode_file(layout_data, platform, lang) {
+function output_keycode_file(layout_data, platform, lang, from) {
     var output_file_data = (
-        COMMON_HEADER_COPYRIGHT + "class Keycode:\n"
+        COMMON_HEADER_COPYRIGHT.replace("<FROM>", from)
+        + "class Keycode:\n"
     );
     function ck(x) {
         var l = x[0];
@@ -408,23 +410,20 @@ function download_layout() {
     console.log(url);
 
     $.get(url, (data) => {
-        console.log(data);
-
         var virtual_key_defs_lang = get_vk_to_sc(data);
         var layout_data = get_layout_data(virtual_key_defs_lang);
-
-        console.log(layout_data);
+        var from = url;
 
         zip_name = "keyboard_layout_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + ".zip";
 
         output_layout_name = "keyboard_layout_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + ".py";
-        output_layout_data = output_layout_file(layout_data, platform, lang);
+        output_layout_data = output_layout_file(layout_data, platform, lang, from);
         // console.log(output_keycode_data);
         $("#output_layout_name").html(output_layout_name);
         $("#output_layout_data").html(output_layout_data);
 
         output_keycode_name = "keycode_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + ".py";
-        output_keycode_data = output_keycode_file(layout_data, platform, lang);
+        output_keycode_data = output_keycode_file(layout_data, platform, lang, from);
         // console.log(output_keycode_data);
         $("#output_keycode_name").html(output_keycode_name);
         $("#output_keycode_data").html(output_keycode_data);
@@ -432,14 +431,22 @@ function download_layout() {
         var outputZip = new JSZip();
         outputZip.file(output_layout_name, output_layout_data);
         outputZip.file(output_keycode_name, output_keycode_data);
+        // 
+        console.log(SAMPLE_CODE_DATA);
+        SAMPLE_CODE_DATA = SAMPLE_CODE_DATA.replaceAll(
+            "keyboard_layout_win_fr", output_layout_name.replace(".py", "")
+        ).replaceAll(
+            "keycode_win_fr", output_keycode_name.replace(".py", "")
+        );
+        console.log(SAMPLE_CODE_DATA);
         outputZip.file(BASE_LAYOUT_NAME, BASE_LAYOUT_DATA);
         outputZip.file(SAMPLE_CODE_NAME, SAMPLE_CODE_DATA);
         // TODO: add keyboard_layout.py
         outputZip.generateAsync({type:"base64"}).then(function (base64) {
             zip_data = "data:application/zip;base64," + base64;
-            $("#download_link a").attr("href", zip_data);
-            $("#download_link a").attr("download", zip_name);
-            $("#download_link").show();
+            $("#download_link").attr("href", zip_data);
+            $("#download_link").attr("download", zip_name);
+            $("#download_link").css("display", "block");
             // window.location = zip_name
         }, function (err) {
             console.log(err);
