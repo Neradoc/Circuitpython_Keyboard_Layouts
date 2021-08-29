@@ -17,16 +17,20 @@ From layout file at <FROM>
 `)
 
 // "https://raw.githubusercontent.com/Neradoc/Circuitpython_Keyboard_Layouts/main/libraries/keyboard_layout.txt"
-var BASE_LAYOUT = "./src/keyboard_layout.py";
-var BASE_LAYOUT_NAME = "keyboard_layout.py";
-var BASE_LAYOUT_DATA = "";
+var BASE_DIR = "./src/";
+// var BASE_LAYOUT = "./src/keyboard_layout.py";
+// var BASE_LAYOUT_NAME = "keyboard_layout.py";
+// var BASE_LAYOUT_DATA = "";
 
-var SAMPLE_CODE = "./src/sample_code.py";
+var BASE_LAYOUT_NAME = "keyboard_layout{}";
+var BASE_LAYOUT = "./src/";
+
 var SAMPLE_CODE_NAME = "sample_code.py";
+var SAMPLE_CODE = BASE_DIR + SAMPLE_CODE_NAME;
 var SAMPLE_CODE_DATA = "";
 
 
-$.get(BASE_LAYOUT,
+/*$.get(BASE_LAYOUT,
     (data) => {
         BASE_LAYOUT_DATA = data;
 //         BASE_LAYOUT_DATA = BASE_LAYOUT_DATA.replace(
@@ -34,7 +38,7 @@ $.get(BASE_LAYOUT,
 //         );
     },
     "text"
-);
+);*/
 $.get(SAMPLE_CODE, (data) => { SAMPLE_CODE_DATA = data; }, "text");
 
 
@@ -128,8 +132,11 @@ function get_vk_to_sc(data) {
         case "VK_MENU":
             vk_to_sc[kname]["alt"] = text;
             break;
-        default:
+        case undefined:
             vk_to_sc[kname]["letter"] = text;
+            break;
+        default:
+            // do nothing
             break;
         }
     }
@@ -166,12 +173,14 @@ function get_vk_to_sc(data) {
                     var wit = $(res).attr("With");
                     set_res(name, wit, text);
                 } else {
+                    var wit = $(res).attr("With");
                     $(res).children("DeadKeyTable").children("Result").each(
                     (index, deadres) => {
-                        var wit = $(deadres).attr("With");
-                        if( wit == " ") {
+                        var dwit = $(deadres).attr("With");
+                        if( dwit == " ") {
                             var text = $(deadres).attr("Text");
                             set_res(name, wit, text);
+                            vk_to_sc[name]["dead"] = true;
                         } else {
                             // TODO: multi-keys dead keys ?
                             // set_res(vk_to_sc, name, text)
@@ -257,6 +266,7 @@ function get_layout_data(virtual_key_defs_lang) {
 
         // find the letter somehow
         // letter as defined in the keyboard definition
+
         if( "letter" in key_info ) {
             var letter = key_info["letter"];
             var pos = letter.charCodeAt(0);
@@ -286,7 +296,7 @@ function get_layout_data(virtual_key_defs_lang) {
             var letter = key_info["shift"];
             var pos = letter.charCodeAt(0);
             if( pos < 128 ) {
-                if( charas[pos] == null ) {
+                if( charas[pos] == null && asciis[pos] == null) {
                     asciis[pos] = keycode | SHIFT_FLAG;
                     charas[pos] = letter;
                 }
@@ -400,7 +410,7 @@ function output_keycode_file(layout_data, platform, lang, from) {
 }
 
 function download_layout() {
-    $("#download_link").hide();
+    $(".download_link").hide();
 
     var platform = "win";
     var url = $("#input").val();
@@ -414,7 +424,7 @@ function download_layout() {
         var layout_data = get_layout_data(virtual_key_defs_lang);
         var from = url;
 
-        zip_name = "keyboard_layout_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + ".zip";
+        zip_name = "keyboard_layout_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + "-{}.zip";
 
         output_layout_name = "keyboard_layout_" + platform.toLocaleLowerCase() + "_" + lang.toLocaleLowerCase() + ".py";
         output_layout_data = output_layout_file(layout_data, platform, lang, from);
@@ -428,28 +438,45 @@ function download_layout() {
         $("#output_keycode_name").html(output_keycode_name);
         $("#output_keycode_data").html(output_keycode_data);
 
-        var outputZip = new JSZip();
-        outputZip.file(output_layout_name, output_layout_data);
-        outputZip.file(output_keycode_name, output_keycode_data);
-        // 
-        console.log(SAMPLE_CODE_DATA);
         SAMPLE_CODE_DATA = SAMPLE_CODE_DATA.replaceAll(
             "keyboard_layout_win_fr", output_layout_name.replace(".py", "")
         ).replaceAll(
             "keycode_win_fr", output_keycode_name.replace(".py", "")
         );
-        console.log(SAMPLE_CODE_DATA);
-        outputZip.file(BASE_LAYOUT_NAME, BASE_LAYOUT_DATA);
-        outputZip.file(SAMPLE_CODE_NAME, SAMPLE_CODE_DATA);
-        // TODO: add keyboard_layout.py
-        outputZip.generateAsync({type:"base64"}).then(function (base64) {
-            zip_data = "data:application/zip;base64," + base64;
-            $("#download_link").attr("href", zip_data);
-            $("#download_link").attr("download", zip_name);
-            $("#download_link").css("display", "block");
-            // window.location = zip_name
-        }, function (err) {
-            console.log(err);
-        });
+
+        zips = [
+            { extension: ".py", extout: ".py", id: "", version: "py" },
+            { extension: "6.mpy", extout: ".mpy", id: "6", version: "mpy6" },
+            { extension: "7.mpy", extout: ".mpy", id: "7", version: "mpy7" },
+        ];
+        for( z in zips ) {
+            (() => {
+                var zipper = zips[z];
+                //
+                var outputZip = new JSZip();
+                outputZip.file(output_layout_name, output_layout_data);
+                outputZip.file(output_keycode_name, output_keycode_data);
+                outputZip.file(SAMPLE_CODE_NAME, SAMPLE_CODE_DATA);
+                //
+                var base_layout_name = BASE_LAYOUT_NAME.replace("{}", zipper.extout);
+                var base_layout_local = BASE_LAYOUT_NAME.replace("{}", zipper.extension);
+                var base_layout_file = BASE_DIR + base_layout_local;
+                $.get(base_layout_file, (data) => {
+                    outputZip.file(base_layout_name, data);
+                    outputZip.generateAsync({type:"base64"}).then(function (base64) {
+                        zip_data = "data:application/zip;base64," + base64;
+                        zip_file = zip_name.replace("{}", zipper.version);
+                        $("#download_link"+zipper.id).attr("href", zip_data);
+                        $("#download_link"+zipper.id).attr("download", zip_file);
+                        $("#download_link"+zipper.id).attr("title", zip_file);
+                        $("#download_link"+zipper.id).show();
+                    }, function (err) {
+                        console.log("DIDN'T ZIP IT", err);
+                    });
+                }, function (err) {
+                    console.log("DIDN'T DOWNLOAD", err);
+                }, "text");
+            })();
+        }
     }, "text");
 }
