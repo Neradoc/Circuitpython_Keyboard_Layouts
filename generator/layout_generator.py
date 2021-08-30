@@ -3,6 +3,7 @@ import json
 import natsort
 import os
 import pprint
+import requests
 
 import click
 import xmltodict
@@ -222,6 +223,14 @@ class LayoutData:
         self.altgr = altgr
         self.high = high
         self.keycodes = keycodes
+    def __repr__(self):
+        return repr({
+            "asciis": self.asciis,
+            "charas": self.charas,
+            "altgr": self.altgr,
+            "high": self.high,
+            "keycodes": self.keycodes,
+        })
 
 
 def get_layout_data(virtual_key_defs_lang):
@@ -428,27 +437,39 @@ def compare_lang(layout_data, lang="fr"):
 
 
 @click.group(invoke_without_command=True)
-@click.option("--file", "-f", required=True)
+@click.option("--keyboard", "-k", required=True)
 @click.option("--lang", "-l", default="")
 @click.option("--platform", "-p", default="win")
 @click.option("--output", "-o", is_flag=True)
 @click.option("--output-layout", default="")
 @click.option("--output-keycode", default="")
 @click.option("--debug/--no-debug", "-d", is_flag=True)
-def main(file, lang, platform, output, output_layout, output_keycode, debug):
+def main(keyboard, lang, platform, output, output_layout, output_keycode, debug):
     global DEBUG
     DEBUG = debug
+    if DEBUG:
+        print(">", keyboard)
+        print(">", platform)
+        print(">", lang)
+    if os.path.isfile(keyboard):
+        lang = keyboard.split(".")[0].split("_")[-1].split("-")[-1]
+        with open(keyboard, "r") as fp:
+            data = fp.read()
+    else:
+        if not keyboard.startswith("https://kbdlayout.info/"):
+            lang = keyboard.replace("/", "")
+            url = "https://kbdlayout.info/kbd" + keyboard
+        else:
+            lang = keyboard[26:]
+        url = keyboard + "/download/xml"
+        res = requests.get(url)
+        data = res.content.decode("utf8")
+
     if not platform:
         platform = "Win"
     if not lang:
-        lang = file.split(".")[0].split("_")[-1].split("-")[-1]
-    # file = FILE_INTERNATIONAL
-    if DEBUG:
-        print(">", file)
-        print(">", platform)
-        print(">", lang)
-    with open(file, "r") as fp:
-        data = fp.read()
+        lang = "xx"
+
     virtual_key_defs_lang = get_vk_to_sc(data)
     layout_data = get_layout_data(virtual_key_defs_lang)
     if DEBUG:

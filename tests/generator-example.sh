@@ -2,7 +2,7 @@
 
 echo "##########################################################"
 echo "# US        ##############################################"
-python3 -m generator -f _xml/win/kbdlayout-info-us.xml -o
+python3 -m generator -k _xml/win/kbdlayout-info-us.xml -o
 echo "# KEYCODE   ##############################################"
 python3 tests/test_keycode.py -l new -r old _build/generated/keycode_win_us.py generator/keycode_us_ref.py
 echo "# LAYOUT    ##############################################"
