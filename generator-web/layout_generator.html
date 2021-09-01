@@ -73,21 +73,12 @@
 			margin: auto;
 		}
 	</style>
-	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script src="js/jszip.js"></script>
-	<script src="js/jszip-utils.js"></script>
-	<script type="text/javascript" src="src/keycode_name_to_virtualkey.js"></script>
-	<script type="text/javascript" src="src/keycode_us_ref.js"></script>
-	<script type="text/javascript" src="src/virtualkey_table_us.js"></script>
-	<script type="text/javascript" src="layout_generator.js"></script>
-	<script type="text/javascript" language="javascript" charset="utf-8">
-		// $(()=>{ main(); });
-	</script>
+	<script type="text/javascript" src="layout_generator_link.js"></script>
 </head>
 <body>
 <div id="content">
-<p class="warning">This will not work with browsers that block access to external sites from javascript.<br/>Oh well, I'll try something else...</p>
+<!-- <p class="warning">This will not work with browsers that block access to external sites from javascript.<br/>Oh well, I'll try something else...</p> -->
 <p>Generate a Windows keyboard layout for Circuitpython's <a href="https://circuitpython.readthedocs.io/projects/hid/en/latest/">adafruit_hid</a>.</p>
 <ul>
 	<li>Go to <a target="_BLANK" href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout's page.</li>
@@ -103,7 +94,7 @@
 <p class="note">Note: There are additional links to have the common keyboard_layout file pre-compiled for Circuitpython 6 or 7. A pre-compiled (.mpy) file takes less space and is faster to load. The generated layout is not pre-compiled (yet).</p>
 <p>
 	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdfr"/>
-	<button onclick="download_layout(); return false;">Make Zip Bundle</button>
+	<button onclick="download_layout(); return false;">Make Zip Bundle Links</button>
 </p>
 <p id="download_block">
 	<a class="download_link" id="download_link" href="" download="">Download the zip file (.py)</a>

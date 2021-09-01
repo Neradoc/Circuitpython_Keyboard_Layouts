@@ -1,10 +1,11 @@
-// import { name_to_virtualkey } from './src/keycode_name_to_virtualkey.js';
-// import { Keycode } from './src/keycode_us_ref.js';
-// import { VIRTUAL_KEY_US } from './src/virtualkey_table_us.js';
-
-// var base_url = "http://kbdlayout.info";
-// var keyboard_fr_url = base_url + "/kbdfr";
-// var keyboard_fr_xml_url = keyboard_fr_url + "/download/xml";
+/*
+	<script src="js/jszip.js"></script>
+	<script src="js/jszip-utils.js"></script>
+	<script type="text/javascript" src="src/keycode_name_to_virtualkey.js"></script>
+	<script type="text/javascript" src="src/keycode_us_ref.js"></script>
+	<script type="text/javascript" src="src/virtualkey_table_us.js"></script>
+	<script type="text/javascript" src="layout_generator.js"></script>
+*/
 
 var COMMON_HEADER_COPYRIGHT = (
 `# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
