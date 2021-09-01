@@ -1,39 +1,9 @@
-import html
-import json
-import natsort
 import os
-import pprint
-import importlib.util
-
-import click
-import xmltodict
-
-# scancode / keycode
-SPECIAL_KEYCODES = {
-    # key, shift, option, shift-option
-    0x56: 0x64,  # ["<",">","≤","≥"]
-    0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
-}
-
 import sys
+import click
+import importlib.util
+import xmltodict
 sys.path.append("libraries")
-
-DEBUG = True
-BUILD_DIR = os.path.join("_build", "generated")
-FILE_US = "keything-us.xml"
-
-LIGHT = "\033[37m"
-GREY = "\033[90m"
-RED = "\033[1;91m"
-GREEN = "\033[92m"
-BLUE = "\033[94m"
-MAGENTA = "\033[95m"
-CYAN = "\033[96m"
-BOLD = "\033[1;49m"
-
-YELLOW = "\033[1;93m"
-WHITE = "\033[1;37m"
-NOC = "\033[0m"
 
 def load_module(file, name):
     spec = importlib.util.spec_from_file_location(name, file)
