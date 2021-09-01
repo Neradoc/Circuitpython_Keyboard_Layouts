@@ -422,7 +422,7 @@ def make_layout_file(layout_data):
     for k, c in layout_data.combined.items():
         a, b = c
         #output_file_data += f"        {repr(k)}: b\"\\x{a:02x}\\x{b:02x}\",\n"
-        output_file_data += f"        {repr(k)}: \"\\x{a:02x}{b}\",\n"
+        output_file_data += f"        {repr(k)}: b\"\\x{a:02x}{b}\",\n"
     output_file_data += (
         "    }\n"
     )

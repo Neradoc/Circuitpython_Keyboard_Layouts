@@ -2,7 +2,7 @@
 
 echo "-s to skip copying the files to libraries/"
 
-LISTE="fr:fr gr:dede br:br sw:sw da:da cz1:cz1 cz:cz"
+LISTE="fr:fr gr:de br:br sw:sw da:da cz1:cz1 cz:cz"
 
 for LL in $LISTE; do
 	IFS=":"

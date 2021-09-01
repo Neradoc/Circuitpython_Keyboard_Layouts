@@ -38,6 +38,12 @@ class KeyboardLayoutBase:
         self.keyboard = keyboard
 
     def _write(self, char, keycode):
+        if keycode == 0:
+            raise ValueError(
+                "No keycode available for character {letter} ({num}/0x{num:02x}).".format(
+                    letter=repr(char), num=ord(char)
+                )
+            )
         if char in self.NEED_ALTGR:
             # Add altgr modifier
             self.keyboard.press(self.RIGHT_ALT_CODE)
@@ -56,14 +62,22 @@ class KeyboardLayoutBase:
             (such as some control characters).
         """
         for char in string:
-            if char in self.COMBINED_KEYS:
-                self._write(char, ord(self.COMBINED_KEYS[char][0]))
-                char = self.COMBINED_KEYS[char][1]
+            # find easy ones first
+            keycode = self._char_to_keycode(char)
+            if keycode > 0:
+                self._write(char, keycode)
+            # find combined keys
+            elif char in self.COMBINED_KEYS:
+                self._write(char, self.COMBINED_KEYS[char][0])
+                char = chr(self.COMBINED_KEYS[char][1])
                 keycode = self._char_to_keycode(char)
                 self._write(char, keycode)
             else:
-                keycode = self._char_to_keycode(char)
-                self._write(char, keycode)
+                raise ValueError(
+                    "No keycode available for character {letter} ({num}/0x{num:02x}).".format(
+                        letter=repr(char), num=ord(char)
+                    )
+                )
 
     def keycodes(self, char):
         """Return a tuple of keycodes needed to type the given character.
@@ -74,6 +88,9 @@ class KeyboardLayoutBase:
         :raises ValueError: if ``char`` is not ASCII or there is no keycode for it.
         """
         keycode = self._char_to_keycode(char)
+        if keycode == 0:
+            return []
+
         codes = []
         if char in self.NEED_ALTGR:
             codes.append(self.RIGHT_ALT_CODE)
@@ -97,12 +114,7 @@ class KeyboardLayoutBase:
             return self.HIGHER_ASCII[char]
         if ord(char) in self.HIGHER_ASCII:
             return self.HIGHER_ASCII[ord(char)]
-
-        raise ValueError(
-            "Unsupported non-ASCII character {letter} ({num}/0x{num:02x}).".format(
-                letter=str(char), num=ord(char)
-            )
-        )
+        return 0
 
     def _char_to_keycode(self, char):
         """Return the HID keycode for the given ASCII character, with the SHIFT_FLAG possibly set.
@@ -114,10 +126,4 @@ class KeyboardLayoutBase:
         if char_val > len(self.ASCII_TO_KEYCODE):
             return self._above128char_to_keycode(char)
         keycode = self.ASCII_TO_KEYCODE[char_val]
-        if keycode == 0:
-            raise ValueError(
-                "No keycode available for character {letter} ({num}/0x{num:02x}).".format(
-                    letter=str(char), num=char_val
-                )
-            )
         return keycode
