@@ -18,13 +18,18 @@ SPECIAL_KEYCODES = {
     0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
 }
 
-COMMON_HEADER_COPYRIGHT = """
-# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
+COMMON_HEADER_COPYRIGHT = """# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
 #
 # SPDX-License-Identifier: MIT
 \"\"\"
 This file was automatically generated using Circuitpython_Keyboard_Layouts
 \"\"\"
+
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
+
+
 """
 
 DEBUG = True
@@ -154,13 +159,19 @@ def get_vk_to_sc(data):
                             if "DeadKeyTable" in res:
                                 if modif(res) == "": continue
                                 firstkey = res["DeadKeyTable"]["@Accent"]
-                                deadname = res["DeadKeyTable"]["@Name"].replace(" ","_")
+                                if "@Name" in res["DeadKeyTable"]:
+                                    deadname = res["DeadKeyTable"]["@Name"].replace(" ","_")
+                                else:
+                                    deadname = "_accent" + "".join(["_" + str(ord(x)) for x in firstkey])
                                 # dead key base: in keycode, not in layout
                                 if deadname not in vk_to_sc:
                                     vk_to_sc[deadname] = {
                                         "scancode": sckey,
                                         "dead": True,
                                     }
+                                else:
+                                    if DEBUG:
+                                        print("Dead Key", deadname, "already here")
                                 vk_to_sc[deadname][modif(res)] = firstkey
                                 for deadres in res["DeadKeyTable"]["Result"]:
                                     secondkey = deadres["@With"]
@@ -386,7 +397,7 @@ def get_layout_data(virtual_key_defs_lang):
     )
 
 
-def make_layout_file(layout_data, platform, lang):
+def make_layout_file(layout_data):
     output_file_data = (
         COMMON_HEADER_COPYRIGHT
         + "from keyboard_layout import KeyboardLayoutBase\n"
@@ -422,7 +433,7 @@ def output_layout_file(output_file, output_file_data):
         fp.write(output_file_data)
 
 
-def make_keycode_file(layout_data, platform, lang):
+def make_keycode_file(layout_data):
     output_file_data = (
         COMMON_HEADER_COPYRIGHT + "class Keycode:\n"
     )
@@ -470,15 +481,18 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
         print(">", platform)
         print(">", lang)
     if os.path.isfile(keyboard):
-        lang = keyboard.split(".")[0].split("_")[-1].split("-")[-1]
+        if not lang:
+            lang = keyboard.split(".")[0].split("_")[-1].split("-")[-1]
         with open(keyboard, "r") as fp:
             data = fp.read()
     else:
         if not keyboard.startswith("https://kbdlayout.info/"):
-            lang = keyboard.replace("/", "")
+            if not lang:
+                lang = keyboard.replace("/", "")
             url = "https://kbdlayout.info/kbd" + keyboard
         else:
-            lang = keyboard[26:]
+            if not lang:
+                lang = keyboard[26:]
         url = keyboard + "/download/xml"
         res = requests.get(url)
         data = res.content.decode("utf8")
@@ -491,7 +505,7 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
     virtual_key_defs_lang = get_vk_to_sc(data)
     layout_data = get_layout_data(virtual_key_defs_lang)
 
-    data_layout = make_layout_file(layout_data, platform, lang)
+    data_layout = make_layout_file(layout_data)
     if output or output_layout:
         os.makedirs(BUILD_DIR, exist_ok=True)
         if not output_layout:
@@ -503,7 +517,7 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
     if verbose == "layout" or verbose == "v":
         print(data_layout)
 
-    data_keycode = make_keycode_file(layout_data, platform, lang)
+    data_keycode = make_keycode_file(layout_data)
     if output or output_keycode:
         os.makedirs(BUILD_DIR, exist_ok=True)
         if not output_keycode:
