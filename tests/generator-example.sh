@@ -12,7 +12,7 @@ echo "##########################################################"
 echo "# FR        ##############################################"
 echo "# LAYOUT    ##############################################"
 python3 -m generator -k _xml/win/kbdlayout-info-fr.xml -o
-python3 tests/test_layout.py -l new -r old _build/generated/keyboard_layout_win_fr.py libraries/keyboard_layout_win_fr.py
+python3 tests/test_layout.py -l new -r old _build/generated/keyboard_layout_win_fr.py libraries/layouts/keyboard_layout_win_fr.py
 
 echo "# WRITE     ##############################################"
 python3 tests/test_keyboard.py _build/generated/keyboard_layout_win_fr.py
@@ -21,4 +21,4 @@ echo "##########################################################"
 echo "# DE        ##############################################"
 echo "# LAYOUT    ##############################################"
 python3 -m generator -k _xml/win/kbdlayout-info-de.xml -o
-python3 tests/test_layout.py -l new -r old _build/generated/keyboard_layout_win_de.py libraries/keyboard_layout_win_de_de.py
+python3 tests/test_layout.py -l new -r old _build/generated/keyboard_layout_win_de.py libraries/layouts/keyboard_layout_win_de_de.py

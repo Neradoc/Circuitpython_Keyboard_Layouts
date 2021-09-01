@@ -3,7 +3,9 @@ import sys
 import click
 import importlib.util
 import xmltodict
-sys.path.append("libraries")
+sys.path.append("libraries/common")
+sys.path.append("libraries/layouts")
+sys.path.append("libraries/keycodes")
 
 def load_module(file, name):
     spec = importlib.util.spec_from_file_location(name, file)

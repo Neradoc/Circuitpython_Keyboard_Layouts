@@ -22,7 +22,9 @@ def main(keycodes):
 
     keyboard = Keyboard()
     sys.path.append(os.path.dirname(keycodes))
-    sys.path.append("libraries")
+    sys.path.append("libraries/common")
+    sys.path.append("libraries/layouts")
+    sys.path.append("libraries/keycodes")
 
     layout_module = __import__(os.path.basename(keycodes)[:-3])
     layout = layout_module.KeyboardLayout(keyboard)
