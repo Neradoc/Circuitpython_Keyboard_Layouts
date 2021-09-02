@@ -312,7 +312,7 @@ def get_layout_data(virtual_key_defs_lang):
             if "secondkey" in key_info:
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, 0)
             elif pos < 128:
                 if not charas[pos]:
                     if not dead:
@@ -338,7 +338,7 @@ def get_layout_data(virtual_key_defs_lang):
             if "secondkey" in key_info:
                 firstkey = keycode | SHIFT_FLAG
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, 0)
             elif pos < 128:
                 if not charas[pos]:
                     asciis[pos] = keycode | SHIFT_FLAG
@@ -352,27 +352,32 @@ def get_layout_data(virtual_key_defs_lang):
                     if DEBUG:
                         print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
 
-        if "altgr" in key_info and "dead" not in key_info:
-            letter = key_info["altgr"]
-            dead = "dead" in key_info
-            pos = ord(letter)
+        def add_alt_gr(letter):
             if letter in NEED_ALTGR:
                 if DEBUG:
                     print(RED + "Already in NEED_ALTGR", letter, NOC)
             else:
                 NEED_ALTGR.append(letter)
+
+        if "altgr" in key_info and "dead" not in key_info:
+            letter = key_info["altgr"]
+            dead = "dead" in key_info
+            pos = ord(letter)
             if DEBUG:
                 print("A", num, pos, letter, scancode, hex(keycode))
             if "secondkey" in key_info:
+                # NOTE: don't add to the altgr list
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, 1)
             elif pos < 128:
                 if not charas[pos]:
+                    add_alt_gr(letter)
                     asciis[pos] = keycode
                     charas[pos] = letter
             else:
                 if letter not in HIGHER_ASCII:
+                    add_alt_gr(letter)
                     HIGHER_ASCII[letter] = keycode
                 else:
                     if DEBUG:
@@ -420,9 +425,12 @@ def make_layout_file(layout_data):
         "    COMBINED_KEYS = {\n"
     )
     for k, c in layout_data.combined.items():
-        a, b = c
-        #output_file_data += f"        {repr(k)}: b\"\\x{a:02x}\\x{b:02x}\",\n"
-        output_file_data += f"        {repr(k)}: b\"\\x{a:02x}{b}\",\n"
+        first, second, altgr = c
+        output_file_data += (
+            f"        {repr(k)}: "
+            f"b\"\\x{altgr:02x}\\x{first:02x}{second}\","
+            "\n"
+        )
     output_file_data += (
         "    }\n"
     )
