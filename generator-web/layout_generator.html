@@ -83,15 +83,15 @@
 <ul>
 	<li>Go to <a target="_BLANK" href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout's page.</li>
 	<li>Paste the url of the layout into the box below (see example).</li>
-	<li>Press the "Make Zip Bundle" button to generate the zip with the modules.</li>
-	<li>Click the link to download the zip.</li>
+	<li>Press the "Make Zip Bundle Links" button.</li>
+	<li>Click the link to download the zip with the modules.</li>
 	<li>Unzip the zip.</li>
 	<li>Copy the files to your boards "lib" directory (not the sample code).</li>
 	<li>Don't forget ton install adafruit_hid too if it's not already there.</li>
 	<li>Follow the sample code, included in the zip.</li>
 	<li>Come bother me <a href="https://adafru.it/discord">on discord</a> if it doesn't work (no private messages).</li>
 </ul>
-<p class="note">Note: There are additional links to have the common keyboard_layout file pre-compiled for Circuitpython 6 or 7. A pre-compiled (.mpy) file takes less space and is faster to load. The generated layout is not pre-compiled (yet).</p>
+<p class="note">Note: There are additional links to have the module files pre-compiled for Circuitpython 6 or 7. A pre-compiled (.mpy) file takes less space and is faster to load. It also requires less RAM to load, which <i>might</i> allow it to be used on a SAMD21 board (often refered to M0, they are very limited in memory when running Circuitpython).</p>
 <p>
 	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdfr"/>
 	<button onclick="download_layout(); return false;">Make Zip Bundle Links</button>
