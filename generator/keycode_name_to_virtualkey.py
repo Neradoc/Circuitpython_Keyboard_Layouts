@@ -20,6 +20,8 @@ name_to_virtualkey = {
     "RIGHT_CONTROL": "RCONTROL",
     "LEFT_CONTROL": "LCONTROL",
     "CONTROL": "LCONTROL",
+    # ALT GR
+    "ALTGR": "RMENU",
     # windows key
     "LEFT_GUI": "LWIN",
     "GUI": "LWIN",
