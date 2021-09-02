@@ -23,6 +23,7 @@ class KeyboardLayoutBase:
     # We use the top bit of each byte (0x80) to indicate
     # that the shift key should be pressed
     SHIFT_FLAG = 0x80
+    RIGHT_ALT_FLAG = 0x01
     SHIFT_CODE = 0xE1
     RIGHT_ALT_CODE = 0xE6
     ASCII_TO_KEYCODE = ()
@@ -37,14 +38,14 @@ class KeyboardLayoutBase:
         """
         self.keyboard = keyboard
 
-    def _write(self, char, keycode):
+    def _write(self, char, keycode, altgr=False):
         if keycode == 0:
             raise ValueError(
                 "No keycode available for character {letter} ({num}/0x{num:02x}).".format(
                     letter=repr(char), num=ord(char)
                 )
             )
-        if char in self.NEED_ALTGR:
+        if altgr:
             # Add altgr modifier
             self.keyboard.press(self.RIGHT_ALT_CODE)
         # If this is a shifted char, clear the SHIFT flag and press the SHIFT key.
@@ -65,13 +66,14 @@ class KeyboardLayoutBase:
             # find easy ones first
             keycode = self._char_to_keycode(char)
             if keycode > 0:
-                self._write(char, keycode)
+                self._write(char, keycode, char in self.NEED_ALTGR)
             # find combined keys
             elif char in self.COMBINED_KEYS:
-                self._write(char, self.COMBINED_KEYS[char][0])
-                char = chr(self.COMBINED_KEYS[char][1])
+                cchar = self.COMBINED_KEYS[char]
+                self._write(char, cchar[1], cchar[0] & self.RIGHT_ALT_FLAG)
+                char = chr(cchar[2])
                 keycode = self._char_to_keycode(char)
-                self._write(char, keycode)
+                self._write(char, keycode, char in self.NEED_ALTGR)
             else:
                 raise ValueError(
                     "No keycode available for character {letter} ({num}/0x{num:02x}).".format(

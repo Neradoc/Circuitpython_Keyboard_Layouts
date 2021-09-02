@@ -69,6 +69,15 @@ if($result_code != 0) { print("Error Keycodes\n"); }
 
 $keycodes = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $keycodes);
 
+if( !file_exists("src/keyboard_layout6.mpy") ) {
+	exec("mpy-cross/mpy-cross.static-amd64-linux-6 src/keyboard_layout.py");
+	rename("src/keyboard_layout.mpy", "src/keyboard_layout6.mpy");
+}
+if( !file_exists("src/keyboard_layout7.mpy") ) {
+	exec("mpy-cross/mpy-cross.static-amd64-linux-7 src/keyboard_layout.py");
+	rename("src/keyboard_layout.mpy", "src/keyboard_layout7.mpy");
+}
+
 function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 	global $debug;
 	$deletes = array();
