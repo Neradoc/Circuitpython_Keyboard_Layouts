@@ -9,15 +9,17 @@ class Keyboard:
     def press(self, *keycodes):
         for x in keycodes:
             self.codes.append(x)
-        print(" +", ["0x"+f"{k:02x}".upper() for k in keycodes], end="")
+        #print(" +", ["0x"+f"{k:02x}".upper() for k in keycodes], end="")
     def release(self, *keycodes):
-        print(" -", ["0x"+f"{k:02x}".upper() for k in keycodes], end="")
+        pass
+        #print(" -", ["0x"+f"{k:02x}".upper() for k in keycodes], end="")
     def release_all(self):
         self.chars.append(self.codes)
         self.codes = []
-        print(" ;")
+        #print(" ;")
     def send(self, *keycodes):
-        print(" <", ["0x"+f"{k:02x}".upper() for k in keycodes], ">")
+        self.chars.append(keycodes)
+        #print(" <", ["0x"+f"{k:02x}".upper() for k in keycodes], ">")
     def start(self):
         self.chars = []
         self.codes = []
