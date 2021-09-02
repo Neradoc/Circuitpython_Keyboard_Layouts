@@ -18,6 +18,10 @@ SPECIAL_KEYCODES = {
     0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
 }
 
+SHIFT_FLAG = 0x80
+ALTGR_FLAG = 0x80
+NO_ALTGR_FLAG = 0x00
+
 COMMON_HEADER_COPYRIGHT = """# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
 #
 # SPDX-License-Identifier: MIT
@@ -260,7 +264,6 @@ class LayoutData:
 def get_layout_data(virtual_key_defs_lang):
     asciis = [0] * 128
     charas = [""] * 128
-    SHIFT_FLAG = 0x80
     NEED_ALTGR = []
     HIGHER_ASCII = {}
     COMBINED_KEYS = {}
@@ -312,7 +315,7 @@ def get_layout_data(virtual_key_defs_lang):
             if "secondkey" in key_info:
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey, 0)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, NO_ALTGR_FLAG)
             elif pos < 128:
                 if not charas[pos]:
                     if not dead:
@@ -338,7 +341,7 @@ def get_layout_data(virtual_key_defs_lang):
             if "secondkey" in key_info:
                 firstkey = keycode | SHIFT_FLAG
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey, 0)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, NO_ALTGR_FLAG)
             elif pos < 128:
                 if not charas[pos]:
                     asciis[pos] = keycode | SHIFT_FLAG
@@ -369,7 +372,7 @@ def get_layout_data(virtual_key_defs_lang):
                 # NOTE: don't add to the altgr list
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
-                COMBINED_KEYS[letter] = (firstkey, secondkey, 1)
+                COMBINED_KEYS[letter] = (firstkey, secondkey, ALTGR_FLAG)
             elif pos < 128:
                 if not charas[pos]:
                     add_alt_gr(letter)
@@ -426,9 +429,10 @@ def make_layout_file(layout_data):
     )
     for k, c in layout_data.combined.items():
         first, second, altgr = c
+        second = ord(second) | altgr
         output_file_data += (
             f"        {repr(k)}: "
-            f"b\"\\x{altgr:02x}\\x{first:02x}{second}\","
+            f"b\"\\x{first:02x}\\x{second:02x}\","
             "\n"
         )
     output_file_data += (
