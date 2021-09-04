@@ -1,8 +1,22 @@
+"""
+Make International Keyboard:
+
+Letter to virtual key name
+- ascii letters are easy, and indexed
+- non-ascii letters go in the HIGHER_ASCII list
+
+Virtual Key Name to scancode(s)
+- NEED_ALTGR has to be filled too, somehow
+
+Scan Code to USB keycode (sc_to_kc)
+- scancode to US Virtual Key Name (vk_to_sc)
+- match US keycode names and Virtual Key Names (name_to_virtualkey)
+- to USB keycode from US names (name_to_kc)
+"""
 import html
 import json
 import natsort
 import os
-import pprint
 import requests
 
 import click
@@ -11,15 +25,36 @@ from .keycode_name_to_virtualkey import name_to_virtualkey
 from .keycode_us_ref import Keycode
 from .virtualkey_table_us import VIRTUAL_KEY_US
 
-# scancode / keycode
+""" debug level dev: only show dev prints """
+DEBUG_DEV = -1
+""" debug level error: only show errors """
+DEBUG_ERROR = 1
+""" debug level info: show everything """
+DEBUG_INFO = 2
+""" debug level silent: show nothing """
+DEBUG_SILENT = 0
+""" default debug level: show errors """
+DEBUG_LEVEL = DEBUG_ERROR
+""" default target directory for --output """
+BUILD_DIR = os.path.join("_build", "generated")
+
+""" scancodes / keycodes that are not in keycode_us_ref """
 SPECIAL_KEYCODES = {
     # key, shift, option, shift-option
     0x56: 0x64,  # ["<",">","≤","≥"]
     0x29: 0x35,  # ["@","#","•","Ÿ"] ² on windows
 }
-
+""" character names to display in the layout comments """
+CHARACTER_NAMES = {
+    8: "BACKSPACE",
+    # 13: repr("\r"),
+    0x1B: "ESC",
+}
+""" flag in the keycode that says if SHIFT is required for a letter """
 SHIFT_FLAG = 0x80
+""" flag in the combined keys codes for ALTGR with the first key """
 ALTGR_FLAG = 0x80
+""" no altgr flag for the first combined key """
 NO_ALTGR_FLAG = 0x00
 
 COMMON_HEADER_COPYRIGHT = """# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
@@ -36,47 +71,39 @@ __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 """
 
-DEBUG = True
-BUILD_DIR = os.path.join("_build", "generated")
-FILE_US = "keything-us.xml"
+def _echo(*text, nl=True, **kwargs):
+    """ printout things using click with some defaults """
+    text = [
+        (item if isinstance(item, str) else repr(item))
+        for item in text
+    ]
+    click.secho(" ".join(text), nl=nl, **kwargs)
 
-LIGHT = "\033[37m"
-GREY = "\033[90m"
-RED = "\033[1;91m"
-GREEN = "\033[92m"
-BLUE = "\033[94m"
-MAGENTA = "\033[95m"
-CYAN = "\033[96m"
-BOLD = "\033[1;49m"
+def echo(*text, nl=True, **kwargs):
+    """ print as info """
+    if DEBUG_LEVEL >= DEBUG_INFO:
+        _echo(*text, nl=nl, **kwargs)
 
-YELLOW = "\033[1;93m"
-WHITE = "\033[1;37m"
-NOC = "\033[0m"
+def echoE(*text, nl=True, **kwargs):
+    """ print as error, in red by default """
+    if "fg" not in kwargs:
+        kwargs["fg"] = "red"
+    if DEBUG_LEVEL >= DEBUG_ERROR:
+        _echo(*text, nl=nl, **kwargs)
 
-"""
-International Keyboard:
+def echoF(*text, nl=True, **kwargs):
+    """ print only in dev mode """
+    if DEBUG_LEVEL == DEBUG_DEV:
+        _echo(*text, nl=nl, **kwargs)
 
-Letter to virtual key name
-- ascii letters are easy, and indexed
-- non-ascii letters go in the HIGHER_ASCII list
 
-Virtual Key Name to scancode(s)
-- NEED_ALTGR has to be filled too, somehow
-
-Scan Code to USB keycode (sc_to_kc)
-- scancode to US Virtual Key Name (vk_to_sc)
-- match US keycode names and Virtual Key Names (name_to_virtualkey)
-- to USB keycode from US names (name_to_kc)
-"""
+def jprint(data, nl=True, **kwargs):
+    echo("<<< " + str(len(data)) + " >>>", nl, **kwargs)
+    echo(json.dumps(data, indent=2), nl, **kwargs)
 
 
 def filter_codepoints(text):
     return text.replace("\r", "\n")
-
-
-def jprint(data):
-    print("<<< " + str(len(data)) + " >>>")
-    print(json.dumps(data, indent=2))
 
 
 virtualkey_to_keyname = {}
@@ -99,7 +126,9 @@ def list_keycode_name(key, value):
 def get_name_to_keycode():
     name_to_kc = {}
     kcnums = [
-        (name, getattr(Keycode, name)) for name in dir(Keycode) if name.upper() == name
+        (name, getattr(Keycode, name))
+        for name in dir(Keycode)
+        if name.upper() == name
     ]
     kcnums.sort(key=lambda x: x[1])
     for name, kc in kcnums:
@@ -107,14 +136,16 @@ def get_name_to_keycode():
             name = name_to_virtualkey[name]
         name_to_kc[name] = kc
 
-    if DEBUG:
-        print("<<< name_to_kc : " + str(len(name_to_kc)) + " >>>")
+    echo("<<< name_to_kc : " + str(len(name_to_kc)) + " >>>")
     # jprint(name_to_kc)
 
     return name_to_kc
 
 
 def modif(res):
+    """
+    From a "Result" entry, get the modifier id string
+    """
     if "@With" in res:
         if res["@With"] == "VK_NUMLOCK":
             return "numpad"
@@ -141,70 +172,70 @@ def get_vk_to_sc(data):
         vk_to_sc[name] = {
             "scancode": sckey,
         }
-        #
+        # get the "results" from the entry
         if "Result" in key:
             kresult = key["Result"]
             if isinstance(kresult, dict):
                 kresult = [kresult]
-            if isinstance(kresult, list):
-                for res in kresult:
-                    if "@VK" in res:
-                        kname = res["@VK"].replace("VK_", "")
-                        vk_to_sc[kname] = {
+            if not isinstance(kresult, list):
+                echo("What is Result ?", kresult)
+                continue
+        else:
+            continue
+        #
+        for res in kresult:
+            if "@VK" in res:
+                # if the result has its own virtualkey name, use that
+                kname = res["@VK"].replace("VK_", "")
+                vk_to_sc[kname] = {
+                    "scancode": sckey,
+                }
+                text = html.unescape(res["@Text"])
+                vk_to_sc[kname][modif(res)] = text
+            elif "@Text" in res:
+                # if it has a text, it's simple
+                text = html.unescape(res["@Text"])
+                vk_to_sc[name][modif(res)] = text
+            elif "@TextCodepoints" in res:
+                # if it has a codepoint, convert it
+                text = chr(int(res["@TextCodepoints"], 16))
+                text = filter_codepoints(text)
+                vk_to_sc[name][modif(res)] = text
+            elif "DeadKeyTable" in res:
+                # if it is a dead key with a deadkey table, go through it
+                if modif(res) == "":
+                    # unwanted modifier (ctrl or other)
+                    continue
+                # the first key in the sequence (the "dead key" or accent)
+                firstkey = res["DeadKeyTable"]["@Accent"]
+                # the name of the dead key for the Keycode table
+                if "@Name" in res["DeadKeyTable"]:
+                    deadname = res["DeadKeyTable"]["@Name"].replace(" ","_")
+                else:
+                    # if none, generate one with "_" to exclude it from Keycode
+                    deadname = "_accent" + "".join(["_" + str(ord(x)) for x in firstkey])
+                # dead key base: in keycode, not in layout
+                if deadname not in vk_to_sc:
+                    vk_to_sc[deadname] = {
+                        "scancode": sckey,
+                        "dead": True,
+                    }
+                else:
+                    echoE("Dead Key", deadname, "already here")
+                vk_to_sc[deadname][modif(res)] = firstkey
+                for deadres in res["DeadKeyTable"]["Result"]:
+                    secondkey = deadres["@With"]
+                    deadtext = deadres["@Text"]
+                    dk_name = f"_{deadname}_{secondkey}"
+                    if dk_name not in vk_to_sc:
+                        vk_to_sc[dk_name] = {
                             "scancode": sckey,
+                            "firstkey": firstkey,
                         }
-                        text = html.unescape(res["@Text"])
-                        vk_to_sc[kname][modif(res)] = text
-                    elif "@Text" not in res:
-                        if "@TextCodepoints" in res:
-                            text = chr(int(res["@TextCodepoints"], 16))
-                            text = filter_codepoints(text)
-                        else:
-                            if "DeadKeyTable" in res:
-                                if modif(res) == "": continue
-                                firstkey = res["DeadKeyTable"]["@Accent"]
-                                if "@Name" in res["DeadKeyTable"]:
-                                    deadname = res["DeadKeyTable"]["@Name"].replace(" ","_")
-                                else:
-                                    deadname = "_accent" + "".join(["_" + str(ord(x)) for x in firstkey])
-                                # dead key base: in keycode, not in layout
-                                if deadname not in vk_to_sc:
-                                    vk_to_sc[deadname] = {
-                                        "scancode": sckey,
-                                        "dead": True,
-                                    }
-                                else:
-                                    if DEBUG:
-                                        print("Dead Key", deadname, "already here")
-                                vk_to_sc[deadname][modif(res)] = firstkey
-                                for deadres in res["DeadKeyTable"]["Result"]:
-                                    secondkey = deadres["@With"]
-                                    deadtext = deadres["@Text"]
-                                    dk_name = f"_{deadname}_{secondkey}"
-                                    if dk_name not in vk_to_sc:
-                                        vk_to_sc[dk_name] = {
-                                            "scancode": sckey,
-                                            "firstkey": firstkey,
-                                        }
-                                    vk_to_sc[dk_name]["secondkey"] = secondkey
-                                    vk_to_sc[dk_name][modif(res)] = deadtext
-                                    if DEBUG:
-                                        pprint.pprint(vk_to_sc[dk_name])
-                                if DEBUG:
-                                    print(
-                                        "DEAD",
-                                        vk_to_sc[name],
-                                    )
-                            continue
-                    else:
-                        text = html.unescape(res["@Text"])
-                    vk_to_sc[name][modif(res)] = text
-            else:
-                if DEBUG:
-                    print("What is Result ?", kresult)
+                    vk_to_sc[dk_name]["secondkey"] = secondkey
+                    vk_to_sc[dk_name][modif(res)] = deadtext
 
-    if DEBUG:
-        print("<<< vk_to_sc : " + str(len(vk_to_sc)) + " >>>")
+    echo("<<< vk_to_sc : " + str(len(vk_to_sc)) + " >>>")
     # jprint(vk_to_sc)
 
     return vk_to_sc
@@ -286,19 +317,14 @@ def get_layout_data(virtual_key_defs_lang):
         if scancode in SPECIAL_KEYCODES:
             if keycode is None:
                 keycode = SPECIAL_KEYCODES[scancode]
-                if DEBUG:
-                    print(
-                        CYAN + f"SPECIAL scancode:{scancode} > keycode:{keycode}" + NOC
-                    )
+                echo(f"SPECIAL scancode:{scancode} > keycode:{keycode}", fg="cyan")
             else:
                 if keycode != SPECIAL_KEYCODES[scancode]:
-                    if DEBUG:
-                        print(RED + "Different:", keycode, SPECIAL_KEYCODES[scancode])
+                    echoE("Different:", keycode, SPECIAL_KEYCODES[scancode])
         if keycode is None:
             # TODO: check there's none missing
-            if DEBUG:
-                print(BLUE + "Unknown scancode", virtualkey, scancode)
-                print("    ", key_info, NOC)
+            echo("Unknown scancode", virtualkey, scancode, fg="blue")
+            echo("    ", key_info, fg="blue")
             continue
 
         KEYCODES.update(list_keycode_name(virtualkey, keycode))
@@ -310,8 +336,7 @@ def get_layout_data(virtual_key_defs_lang):
             letter = key_info["letter"]
             dead = "dead" in key_info
             pos = ord(letter)
-            if DEBUG:
-                print("L", num, pos, letter, scancode, hex(keycode))
+            echo("L", num, pos, letter, scancode, hex(keycode))
             if "secondkey" in key_info:
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
@@ -321,23 +346,25 @@ def get_layout_data(virtual_key_defs_lang):
                     if not dead:
                         asciis[pos] = keycode
                         charas[pos] = letter
+                    else:
+                        echoF("dead", key_info)
                     KEYCODES.update(list_keycode_name(virtualkey, keycode))
                     # KEYCODES[virtualkey] = keycode
             else:
                 if letter not in HIGHER_ASCII:
                     if not dead:
                         HIGHER_ASCII[letter] = keycode
+                    else:
+                        echoF("dead", key_info)
                     KEYCODES.update(list_keycode_name(virtualkey, keycode))
                     # KEYCODES[virtualkey] = keycode
                 else:
-                    if DEBUG:
-                        print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
+                    echoE("double", letter, HIGHER_ASCII[letter])
 
         if "shift" in key_info and "dead" not in key_info:
             letter = key_info["shift"]
             pos = ord(letter)
-            if DEBUG:
-                print("S", num, pos, letter, scancode, hex(keycode | SHIFT_FLAG))
+            echo("S", num, pos, letter, scancode, hex(keycode | SHIFT_FLAG))
             if "secondkey" in key_info:
                 firstkey = keycode | SHIFT_FLAG
                 secondkey = key_info["secondkey"]
@@ -346,19 +373,16 @@ def get_layout_data(virtual_key_defs_lang):
                 if not charas[pos]:
                     asciis[pos] = keycode | SHIFT_FLAG
                     charas[pos] = letter
-                    if DEBUG:
-                        print("------ SHIFT ", charas[pos])
+                    echo("------ SHIFT ", charas[pos])
             else:
                 if letter not in HIGHER_ASCII:
                     HIGHER_ASCII[letter] = keycode | SHIFT_FLAG
                 else:
-                    if DEBUG:
-                        print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
+                    echoE("double", letter, HIGHER_ASCII[letter])
 
         def add_alt_gr(letter):
             if letter in NEED_ALTGR:
-                if DEBUG:
-                    print(RED + "Already in NEED_ALTGR", letter, NOC)
+                echoE("Already in NEED_ALTGR", letter)
             else:
                 NEED_ALTGR.append(letter)
 
@@ -366,13 +390,16 @@ def get_layout_data(virtual_key_defs_lang):
             letter = key_info["altgr"]
             dead = "dead" in key_info
             pos = ord(letter)
-            if DEBUG:
-                print("A", num, pos, letter, scancode, hex(keycode))
+            echo("A", num, pos, letter, scancode, hex(keycode))
             if "secondkey" in key_info:
                 # NOTE: don't add to the altgr list
                 firstkey = keycode
                 secondkey = key_info["secondkey"]
                 COMBINED_KEYS[letter] = (firstkey, secondkey, ALTGR_FLAG)
+                # not the character still
+                if pos < 128:
+                    asciis[pos] = -1
+                    charas[pos] = letter
             elif pos < 128:
                 if not charas[pos]:
                     add_alt_gr(letter)
@@ -383,17 +410,14 @@ def get_layout_data(virtual_key_defs_lang):
                     add_alt_gr(letter)
                     HIGHER_ASCII[letter] = keycode
                 else:
-                    if DEBUG:
-                        print(RED + "double", letter, HIGHER_ASCII[letter], NOC)
+                    echoE("double", letter, HIGHER_ASCII[letter])
 
         if "numpad" in key_info:
             letter = key_info["numpad"]
-            if DEBUG:
-                print("NUM", key_info)
+            echo("NUM", key_info)
 
-    if DEBUG:
-        print(json.dumps(KEYCODES, indent=2))
-        print(f"--- {len(KEYCODES)} ---")
+    echo(json.dumps(KEYCODES, indent=2))
+    echo(f"--- {len(KEYCODES)} ---")
 
     return LayoutData(
         asciis,
@@ -415,7 +439,21 @@ def make_layout_file(layout_data):
     for x in range(128):
         keycode = layout_data.asciis[x]
         chara = layout_data.charas[x]
-        output_file_data += f"        b'\\x{keycode:02x}'  # {repr(chara)}\n"
+        output_file_data += "        b'\\x{:02x}'".format(max(0, keycode))
+        charepr = ""
+        if chara:
+            charepr = repr(chara)
+            if chara in CHARACTER_NAMES:
+                charepr = CHARACTER_NAMES[chara]
+        if x in CHARACTER_NAMES:
+            charepr = CHARACTER_NAMES[x]
+        if charepr:
+            output_file_data += "  # " + charepr
+            if keycode == 0:
+                output_file_data += " (Ignored)"
+            if keycode == -1:
+                output_file_data += " (Dead key)"
+        output_file_data += "\n"
     output_file_data += (
         "    )\n"
         "    NEED_ALTGR = " + repr("".join(sorted(layout_data.altgr))) + "\n"
@@ -483,15 +521,14 @@ def output_keycode_file(output_file, output_file_data):
 @click.option("--output", "-o", is_flag=True)
 @click.option("--output-layout", default="")
 @click.option("--output-keycode", default="")
-@click.option("--debug/--no-debug", "-d", is_flag=True)
+@click.option("--debug", "-d", type=click.INT, default=1)
 @click.option("--verbose", "-v", default="")
 def main(keyboard, lang, platform, output, output_layout, output_keycode, debug, verbose):
-    global DEBUG
-    DEBUG = debug
-    if DEBUG:
-        print(">", keyboard)
-        print(">", platform)
-        print(">", lang)
+    global DEBUG_LEVEL
+    DEBUG_LEVEL = debug
+    echo(">", keyboard, fg="green")
+    echo(">", platform, fg="green")
+    echo(">", lang, fg="green")
     if os.path.isfile(keyboard):
         if not lang:
             lang = keyboard.split(".")[0].split("_")[-1].split("-")[-1]
@@ -524,10 +561,10 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
             output_layout = os.path.join(
                 BUILD_DIR, f"keyboard_layout_{platform.lower()}_{lang.lower()}.py"
             )
-        print(CYAN + f"Write to {output_layout}" + NOC)
+        echo(f"Write to {output_layout}", fg="cyan")
         output_layout_file(output_layout, data_layout)
     if verbose == "layout" or verbose == "v":
-        print(data_layout)
+        echo(data_layout)
 
     data_keycode = make_keycode_file(layout_data)
     if output or output_keycode:
@@ -536,10 +573,10 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
             output_keycode = os.path.join(
                 BUILD_DIR, f"keycode_{platform.lower()}_{lang.lower()}.py"
             )
-        print(CYAN + f"Write to {output_keycode}" + NOC)
+        echo(f"Write to {output_keycode}", fg="cyan")
         output_keycode_file(output_keycode, data_keycode)
     if verbose == "keycode" or verbose == "v":
-        print(data_keycode)
+        echo(data_keycode)
 
 if __name__ == "__main__":
     main()
