@@ -73,7 +73,7 @@ class KeyboardLayout(KeyboardLayoutBase):
         b'\x26'  # '9'
         b'\xb7'  # ':'
         b'\x36'  # ';'
-        b'\x10'  # '<'
+        b'\x64'  # '<'
         b'\xa4'  # '='
         b'\x1d'  # '>'
         b'\xb6'  # '?'
