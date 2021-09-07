@@ -564,7 +564,7 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
         echo(f"Write to {output_layout}", fg="cyan")
         output_layout_file(output_layout, data_layout)
     if verbose == "layout" or verbose == "v":
-        echo(data_layout)
+        print(data_layout)
 
     data_keycode = make_keycode_file(layout_data)
     if output or output_keycode:
@@ -576,7 +576,7 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
         echo(f"Write to {output_keycode}", fg="cyan")
         output_keycode_file(output_keycode, data_keycode)
     if verbose == "keycode" or verbose == "v":
-        echo(data_keycode)
+        print(data_keycode)
 
 if __name__ == "__main__":
     main()
