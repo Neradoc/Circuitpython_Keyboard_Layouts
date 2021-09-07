@@ -25,14 +25,14 @@
 * Author(s): Dan Halbert, Neradoc
 """
 
-from keyboard_layout import KeyboardLayout
+from keyboard_layout import KeyboardLayoutBase
 
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
-class KeyboardLayoutMacFr(KeyboardLayout):
+class KeyboardLayout(KeyboardLayoutBase):
     """Map ASCII characters to appropriate keypresses on a FR Mac keyboard.
     Non-ASCII characters and most control characters will raise an exception.
     """

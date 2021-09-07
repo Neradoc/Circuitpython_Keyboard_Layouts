@@ -68,7 +68,7 @@ BUNDLE_LIB_DIR = os.path.join(BUNDLE_DIR, "lib")
 BUNDLE_REQ_DIR = os.path.join(BUNDLE_DIR.format(platform="py"), "requirements")
 BUNDLE_ZIP_JSON = os.path.join(BUNDLE_DIR.format(platform="py"), f"{BUNDLE_NAME}.json")
 # where the modules are
-MODULES_DIR = "libraries"
+MODULES_DIR = "libraries/*/"
 # the base requirement file
 REQUIREMENTS_FILE = "requirements-modules.txt"
 # in-file informations to update (or not)
@@ -126,7 +126,7 @@ def file_version_tag(path):
             line = len(data.split("__version__")[0].split("\n"))
             vtag = get_git_command(["git", "blame", "-L", f"{line},{line}", path]).split(" ")[0]
             logs = get_git_command(["git", "log", "--pretty=%H", f"--after={vtag}", path]).split("\n")
-            print(f"{vtag} {line:2d} {num_commits:2d} {len(logs):2d} {path}")
+            # print(f"-tag: {vtag} {line:2d} {num_commits:2d} {len(logs):2d} {path}")
             #
             if file_version.major:
                 major = file_version.major
@@ -181,11 +181,11 @@ def init_directories():
             os.unlink(zip_file)
 
 
-def write_version_to(module_local, file_tag):
+def write_version_to(module_local_path, file_tag):
     """Write the version tag to the __version__ property of the module file."""
     module_file = os.path.join(
         fmt(BUNDLE_LIB_DIR),
-        os.path.relpath(module_local, MODULES_DIR),
+        module_local_path,
     )
     with open(module_file, "r") as fp:
         data = fp.read()
@@ -202,13 +202,16 @@ def write_version_to(module_local, file_tag):
 def make_bundle_files():
     """Create the .py bundle directory."""
     # copy all the layouts and keycodes
-    shutil.copytree(MODULES_DIR, fmt(BUNDLE_LIB_DIR))
+    for mdir in glob.glob(MODULES_DIR):
+        shutil.copytree(mdir, fmt(BUNDLE_LIB_DIR), dirs_exist_ok=True)
 
     module_versions = {}
     # change the version number of all the bundles
-    for module_local in glob.glob(MODULES_DIR + "/*"):
+    for module_local in glob.glob(MODULES_DIR + "*"):
         module_name = os.path.basename(module_local).replace(".py","")
+        module_base = os.path.dirname(module_local)
         if os.path.isdir(module_local):
+            raise OSError("Package modules not implemented yet.")
             # get all versions
             versions = []
             for sub_module in list_all_files(module_local):
@@ -219,43 +222,47 @@ def make_bundle_files():
             file_tag = max(versions)
             # set all versions
             for sub_module in list_all_files(module_local):
-                sub_local_file = os.path.join(module_local, sub_module)
+                module_path = os.path.relpath(module_local, module_base)
+                sub_local_file = os.path.join(module_path, sub_module)
                 write_version_to(sub_local_file, file_tag)
             module_versions[module_name] = file_tag
         elif module_local.endswith(".py"):
             file_tag = file_version_tag(module_local)
-            write_version_to(module_local, file_tag)
+            module_path = os.path.basename(module_local)
+            write_version_to(module_path, file_tag)
             module_versions[module_name] = file_tag
 
     # list of the modules
     all_modules = [
-        mod.replace(".py", "")
-        for mod in os.listdir(MODULES_DIR)
+        os.path.basename(mod)
+        for mod in glob.glob(MODULES_DIR + "*")
         if not mod.startswith(".")
     ]
 
     json_data = {}
 
     for module in all_modules:
+        module_name = module.replace(".py", "")
+        is_package = (module_name == module)
         # create the requirements directory for each module
-        target_dir = os.path.join(BUNDLE_REQ_DIR, module)
+        target_dir = os.path.join(BUNDLE_REQ_DIR, module_name)
         os.makedirs(target_dir, exist_ok=True)
         # copy the common requirements file
         target = os.path.join(target_dir, "requirements.txt")
         shutil.copy(REQUIREMENTS_FILE, target)
         # create the json entry
-        json_data[module] = {
-            "package": False,
+        json_data[module_name] = {
+            "package": is_package,
             "pypi_name": "",
-            "version": module_versions[module],
+            "version": str(module_versions[module_name]),
             "repo": THIS_REPOSITORY,
-            "path": "lib/" + module,
+            "path": "lib/" + module_name,
             "dependencies": [],  # "adafruit_hid"
             "external_dependencies": ["adafruit-circuitpython-hid"],
         }
         # add the dependency to keyboard_layout
-        if module.startswith("keyboard_layout_"):
-            json_data[module]["dependencies"].append("keyboard_layout")
+        if module_name.startswith("keyboard_layout_"):
+            json_data[module_name]["dependencies"].append("keyboard_layout")
             with open(target, "a") as fp:
                 fp.write("\r\nkeyboard_layout\r\n")
 

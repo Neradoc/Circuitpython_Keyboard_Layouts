@@ -1,4 +1,4 @@
-from keyboard_layout import KeyboardLayout
+from keyboard_layout import KeyboardLayoutBase
 
 
 __version__ = "0.0.0-auto.0"
@@ -6,7 +6,7 @@ __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
 # Verbatim copy from keyboard_layout_us, only rewritten the ASCII_TO_KEYCODE table to match the Dvorak keycodes.
-class KeyboardLayoutUsDvo(KeyboardLayout):
+class KeyboardLayout(KeyboardLayoutBase):
     """Map ASCII characters to appropriate keypresses on a standard US PC keyboard.
     Non-ASCII characters and most control characters will raise an exception.
     """

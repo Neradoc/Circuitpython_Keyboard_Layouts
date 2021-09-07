@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Make a layout</title>
+	<style type="text/css" title="text/css">
+		#content {
+			width: 800px;
+			margin: 8px auto;
+		}
+		pre {
+			border: 4px solid blue;
+			border-radius: 16px;
+		}
+		input {
+			width: 400px;
+		}
+		input, button
+		{
+			font-size: inherit;
+			padding: 4px 8px;
+			border-style: solid;
+			border-radius: 8px;
+		}
+		.note {
+			font-size: 85%;
+		}
+		.warning {
+			background: red;
+			color: white;
+			padding: 24px;
+		}
+		#download_block
+		{
+			padding: 0px;
+			margin: 0px;
+			min-height: calc(1em + 16px + 4px);
+		}
+		.download_link
+		{
+			display: block;
+			float: left;
+			color: white;
+			padding: 8px;
+			margin: 0px 1px 0px 0px;
+			border-radius: 16px;
+			background-color: #531B93;
+			text-align: center;
+			text-decoration: none;
+		}
+		.download_link#download_link
+		{
+			display: none;
+			width: calc(800px - 6 * 8px - 80px - 3px);
+		}
+		.download_link#download_link6
+		{
+			display: none;
+			width: calc(40px);
+		}
+		.download_link#download_link7
+		{
+			display: none;
+			width: calc(40px);
+		}
+		#debug_area { display: none; }
+		#sample_code {
+			width: 800px;
+		}
+		#drive_image {
+			display: block;
+			width: 280px;
+			margin: auto;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="layout_generator_link.js"></script>
+</head>
+<body>
+<div id="content">
+<!-- <p class="warning">This will not work with browsers that block access to external sites from javascript.<br/>Oh well, I'll try something else...</p> -->
+<p>Generate a Windows keyboard layout for Circuitpython's <a href="https://circuitpython.readthedocs.io/projects/hid/en/latest/">adafruit_hid</a>.</p>
+<ul>
+	<li>Go to <a target="_BLANK" href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout's page.</li>
+	<li>Paste the url of the layout into the box below (see example).</li>
+	<li>Press the "Make Zip Bundle Links" button.</li>
+	<li>Click the link to download the zip with the modules.</li>
+	<li>Unzip the zip.</li>
+	<li>Copy the files to your boards "lib" directory (not the sample code).</li>
+	<li>Don't forget ton install adafruit_hid too if it's not already there.</li>
+	<li>Follow the sample code, included in the zip.</li>
+	<li>Come bother me <a href="https://adafru.it/discord">on discord</a> if it doesn't work (no private messages).</li>
+</ul>
+<p class="note">Note: There are additional links to have the module files pre-compiled for Circuitpython 6 or 7. A pre-compiled (.mpy) file takes less space and is faster to load. It also requires less RAM to load, which <i>might</i> allow it to be used on a SAMD21 board (often refered to M0, they are very limited in memory when running Circuitpython).</p>
+<p>
+	Url: <input type="text" id="input" value="https://kbdlayout.info/kbdfr"/>
+	<button onclick="download_layout(); return false;">Make Zip Bundle Links</button>
+</p>
+<p id="download_block">
+	<a class="download_link" id="download_link" href="">Download the zip file (.py)</a>
+	<a class="download_link" id="download_link6" href="">CP6</a>
+	<a class="download_link" id="download_link7" href="">CP7</a>
+<p>
+<div id="debug_area">
+	<pre id="debug">DEBUG</pre>
+	<h3 id="output_layout_name"></h3>
+	<pre id="output_layout_data"></pre>
+	<h3 id="output_keycode_name"></h3>
+	<pre id="output_keycode_data"></pre>
+</div>
+<p><img id="drive_image" src="js/drive.png"/></p>
+<p><img id="sample_code" src="js/sample_code.png"/></p>
+</div>
+</body>
+</html>
