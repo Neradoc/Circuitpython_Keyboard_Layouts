@@ -37,7 +37,7 @@ $VERSION = '__version__ = "0.0.1-alpha.0"';
 $source_url = strtolower($source_url);
 
 if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m) ) {
-	$filepath_xml = "data/kbdlaytout-info-" . $m[1] . ".xml";
+	$filepath_xml = "data/kbdlayout-info-" . $m[1] . ".xml";
 	$fileurl = $source_url . "/download/xml";
 
 	if( $lang == "") {
@@ -57,21 +57,26 @@ if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m
 } else {
 	# other platforms or sources
 	header("HTTP/1.1 500 Internal Server Error");
-	print("The source could not be interpreted, or is not supported, check the spelling.");
+	print("<pre>The source could not be interpreted, or is not supported, check the spelling.\n".htmlentities($source_url)."</pre>");
 	exit(0);
 }
 
 $layout_out = array();
-exec("python3 -m generator -k ".$filepath_xml." -v layout", $layout_out, $result_code);
+$layout_command = "python3 -m generator --keyboard ".$filepath_xml." -v layout";
+exec($layout_command, $layout_out, $result_code);
 $layout = join("\n", $layout_out);
 if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
 
 $layout = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $layout);
 
 $keycodes_out = array();
-exec("python3 -m generator -k ".$filepath_xml." -v keycode", $keycodes_out, $result_code);
+$keycodes_command = "python3 -m generator --keyboard ".$filepath_xml." -v keycode";
+exec($keycodes_command, $keycodes_out, $result_code);
 $keycodes = join("\n", $keycodes_out);
 if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }
+
+# $ERRORS[] = $layout_command;
+# $ERRORS[] = $keycodes_command;
 
 $keycodes = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $keycodes);
 
@@ -173,7 +178,12 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 
 if( count($ERRORS) > 0 ) {
 	header("HTTP/1.1 500 Internal Server Error");
-	print("The source could not be interpreted, or is not supported, check the spelling.");
+	print("<pre>\n");
+	print("The source could not be interpreted, or is not supported, check the spelling.\n");
+	print(htmlentities($source_url)."\n");
+	print(htmlentities($filepath_xml)."\n");
+	print(join("\n", $ERRORS));
+	print("\n</pre>");
 } else {
 	make_zip($layout, $keycodes, $cpversion, $platform, $lang);
 }
