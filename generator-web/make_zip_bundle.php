@@ -3,6 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+$ERRORS = [];
+
 $source_url = "";
 $platform = "win";
 $lang = "";
@@ -32,6 +34,8 @@ $LANG_NAMES = [
 $VERSION0 = '__version__ = "0.0.0-auto.0"';
 $VERSION = '__version__ = "0.0.1-alpha.0"';
 
+$source_url = strtolower($source_url);
+
 if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m) ) {
 	$filepath_xml = "data/kbdlaytout-info-" . $m[1] . ".xml";
 	$fileurl = $source_url . "/download/xml";
@@ -52,20 +56,22 @@ if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m
 
 } else {
 	# other platforms or sources
-	die("bad input data");
+	header("HTTP/1.1 500 Internal Server Error");
+	print("The source could not be interpreted, or is not supported, check the spelling.");
+	exit(0);
 }
 
 $layout_out = array();
 exec("python3 -m generator -k ".$filepath_xml." -v layout", $layout_out, $result_code);
 $layout = join("\n", $layout_out);
-if($result_code != 0) { print("Error Layout\n"); }
+if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
 
 $layout = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $layout);
 
 $keycodes_out = array();
 exec("python3 -m generator -k ".$filepath_xml." -v keycode", $keycodes_out, $result_code);
 $keycodes = join("\n", $keycodes_out);
-if($result_code != 0) { print("Error Keycodes\n"); }
+if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }
 
 $keycodes = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $keycodes);
 
@@ -165,4 +171,9 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 	}
 }
 
-make_zip($layout, $keycodes, $cpversion, $platform, $lang);
+if( count($ERRORS) > 0 ) {
+	header("HTTP/1.1 500 Internal Server Error");
+	print("The source could not be interpreted, or is not supported, check the spelling.");
+} else {
+	make_zip($layout, $keycodes, $cpversion, $platform, $lang);
+}

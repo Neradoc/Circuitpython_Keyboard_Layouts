@@ -22,7 +22,7 @@ function download_layout() {
 
         //
         $("#download_link"+zipper.id).attr("href", zurl);
-        $("#download_link"+zipper.id).attr("download", zip_file);
+        // $("#download_link"+zipper.id).attr("download", zip_file);
         $("#download_link"+zipper.id).attr("title", zip_file);
         $("#download_link"+zipper.id).show();
     }
