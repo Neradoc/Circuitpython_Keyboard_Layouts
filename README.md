@@ -43,6 +43,10 @@ else:
 kbd.send(Keycode.COMMAND, Keycode.A)
 ```
 
+### Helpers
+
+The `consumer_control_extended` module brings a big list of names for the consumer controls page in the HID specs, to be used with `adafruit_hid.consumer_control`.
+
 ### The Layout Generator
 
 This needs to be further documentend, but for now `tests/make_validated.sh` shows an example of how to use it. There is a live version of the web generator, though it might not always be the current release.
