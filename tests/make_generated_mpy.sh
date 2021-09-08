@@ -1,17 +1,16 @@
 #!/bin/bash
 
+mkdir -p _build/generated
+mkdir -p _build/compiled
+
 for thingy in `find _build/generated`; do
 	if [[ "$thingy" == *.py ]]; then
 		echo $thingy
-		cp "$thingy" "_build/compiled/"
+		mpy-cross $thingy
+		MPYNAME=`echo $thingy | sed -e 's/\.py$/.mpy/'`
+		mv "$MPYNAME" "_build/compiled/"
 	fi
 done
-cp libraries/common/keyboard_layout.py "_build/compiled/"
 
-cd _build/compiled
-for thingy in `find .`; do
-	if [[ "$thingy" == *.py ]]; then
-		mpy-cross "$thingy"
-		rm "$thingy"
-	fi
-done
+mpy-cross libraries/common/keyboard_layout.py
+mv libraries/common/keyboard_layout.mpy "_build/compiled/"
