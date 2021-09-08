@@ -25,7 +25,7 @@ from .keycode_name_to_virtualkey import name_to_virtualkey
 from .keycode_us_ref import Keycode
 from .virtualkey_table_us import VIRTUAL_KEY_US
 
-""" debug level dev: only show dev prints """
+""" debug level dev: only show dev prints (use for print debugging) """
 DEBUG_DEV = -1
 """ debug level error: only show errors """
 DEBUG_ERROR = 1
@@ -71,59 +71,76 @@ __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 """
 
+
 def _echo(*text, nl=True, **kwargs):
-    """ printout things using click with some defaults """
+    """printout things using click joining all varargs"""
     text = [
         (item if isinstance(item, str) else repr(item))
         for item in text
     ]
     click.secho(" ".join(text), nl=nl, **kwargs)
 
+
 def echo(*text, nl=True, **kwargs):
-    """ print as info """
+    """print as info"""
     if DEBUG_LEVEL >= DEBUG_INFO:
         _echo(*text, nl=nl, **kwargs)
 
+
 def echoE(*text, nl=True, **kwargs):
-    """ print as error, in red by default """
+    """print as error, in red by default"""
     if "fg" not in kwargs:
         kwargs["fg"] = "red"
     if DEBUG_LEVEL >= DEBUG_ERROR:
         _echo(*text, nl=nl, **kwargs)
 
-def echoF(*text, nl=True, **kwargs):
-    """ print only in dev mode """
+
+def echoD(*text, nl=True, **kwargs):
+    """print only in dev mode, use for print debugging"""
     if DEBUG_LEVEL == DEBUG_DEV:
         _echo(*text, nl=nl, **kwargs)
 
 
 def jprint(data, nl=True, **kwargs):
+    """dump a structure as json"""
     echo("<<< " + str(len(data)) + " >>>", nl, **kwargs)
     echo(json.dumps(data, indent=2), nl, **kwargs)
 
 
+def get_v_to_k():
+    """create the reverse virtualkey/keyname table"""
+    virtualkey_to_keyname = {}
+    for name, vkey in name_to_virtualkey.items():
+        if vkey not in virtualkey_to_keyname:
+            virtualkey_to_keyname[vkey] = []
+        virtualkey_to_keyname[vkey].append(name)
+    return virtualkey_to_keyname
+
+
+virtualkey_to_keyname = get_v_to_k()
+
+
 def filter_codepoints(text):
+    """filter converted codepoints from XML"""
     return text.replace("\r", "\n")
 
 
-virtualkey_to_keyname = {}
-for name, vkey in name_to_virtualkey.items():
-    if vkey not in virtualkey_to_keyname:
-        virtualkey_to_keyname[vkey] = []
-    virtualkey_to_keyname[vkey].append(name)
-
-
 def list_keycode_name(key, value):
+    """list the keycode names associated with a virtual key name"""
     output = []
     if key in virtualkey_to_keyname:
         for name in virtualkey_to_keyname[key]:
-            output.append( (name, value) )
+            output.append((name, value))
     else:
         output = [(key, value)]
     return output
 
 
 def get_name_to_keycode():
+    """
+    create the table mapping virtual key names to keycodes
+    from the adafruit_hid Keycode file
+    """
     name_to_kc = {}
     kcnums = [
         (name, getattr(Keycode, name))
@@ -161,6 +178,16 @@ def modif(res):
 
 
 def get_vk_to_sc(data):
+    """
+    Analyse the XML file to make the table of all keys.
+    Each entry:
+    - is indexed by a virtual key name or made-up name
+    - is associated with a scancode
+    - has a letter associated with different modifiers (or lack thereof)
+    - dead keys and combined keys have additional information
+    - dead = True means it's the dead key (don't press it alone)
+    - firstkey/secondkey are the respective keys for dead key combinations
+    """
     keything = xmltodict.parse(data)
     physical_keys = keything["KeyboardLayout"]["PhysicalKeys"]["PK"]
     # jprint(physical_keys)
@@ -210,10 +237,12 @@ def get_vk_to_sc(data):
                 firstkey = res["DeadKeyTable"]["@Accent"]
                 # the name of the dead key for the Keycode table
                 if "@Name" in res["DeadKeyTable"]:
-                    deadname = res["DeadKeyTable"]["@Name"].replace(" ","_")
+                    deadname = res["DeadKeyTable"]["@Name"].replace(" ", "_")
                 else:
                     # if none, generate one with "_" to exclude it from Keycode
-                    deadname = "_accent" + "".join(["_" + str(ord(x)) for x in firstkey])
+                    deadname = "_accent" + "".join(
+                        ["_" + str(ord(x)) for x in firstkey]
+                    )
                 # dead key base: in keycode, not in layout
                 if deadname not in vk_to_sc:
                     vk_to_sc[deadname] = {
@@ -242,6 +271,7 @@ def get_vk_to_sc(data):
 
 
 def get_scancode_to_keycode():
+    """create the table associating scancodes and keycodes from the US XML file"""
     name_to_kc = get_name_to_keycode()
     name_to_kc_left = set(name_to_kc)
     vk_to_sc = get_vk_to_sc(VIRTUAL_KEY_US)
@@ -257,23 +287,26 @@ def get_scancode_to_keycode():
     return sc_to_kc
 
 
-# TODO: add non-US scancodes/keycodes in `sc_to_kc`
+# TODO: are there missing non-US scancodes/keycodes in `sc_to_kc` ?
 
-
-"""
-The actual conversion from scan codes to key codes
-Missing unidentified names
-NUMPAD is particularly missing (it's refed as arrows, page up, etc.)
-"""
-# jprint(sc_to_kc)
-# print("name_to_kc_left", len(name_to_kc_left), sorted(name_to_kc_left))
-# print("vk_to_sc_left", len(vk_to_sc_left), sorted(vk_to_sc_left))
-# kc_to_sc = dict([(y,x) for (x,y) in sc_to_kc.items()])
 
 ########################################################################
 
 
 class LayoutData:
+    """
+    Asimple struct class to carry around the layout information.
+    - asciis has the keycode information for each low ascii character (with shift bit)
+    - charas has said characters, for display in the comment string and testing existence
+    - atgr is the list of letters that need alt-gr pressed
+    - high is the list of high-ascii/unicode letters and their keycode
+    - keycodes is the table associating key names with keycodes (for the Keycode class)
+    - combined is the table of combined keys
+    A combined key has two bytes:
+    - the keycode to the first key, with the high bit as the shift bit
+    - the letter for the second key (assumed to be low ascii)
+    - the second key's high bit is the altgr bit for the first key
+    """
     def __init__(self, asciis, charas, altgr, high, keycodes, combined):
         self.asciis = asciis
         self.charas = charas
@@ -281,18 +314,22 @@ class LayoutData:
         self.high = high
         self.keycodes = keycodes
         self.combined = combined
+
     def __repr__(self):
-        return repr({
-            "asciis": self.asciis,
-            "charas": self.charas,
-            "altgr": self.altgr,
-            "high": self.high,
-            "keycodes": self.keycodes,
-            "combined": self.combined,
-        })
+        return repr(
+            {
+                "asciis": self.asciis,
+                "charas": self.charas,
+                "altgr": self.altgr,
+                "high": self.high,
+                "keycodes": self.keycodes,
+                "combined": self.combined,
+            }
+        )
 
 
 def get_layout_data(virtual_key_defs_lang):
+    """Create the layout data from a language file."""
     asciis = [0] * 128
     charas = [""] * 128
     NEED_ALTGR = []
@@ -347,7 +384,7 @@ def get_layout_data(virtual_key_defs_lang):
                         asciis[pos] = keycode
                         charas[pos] = letter
                     else:
-                        echoF("dead", key_info)
+                        echoD("dead", key_info)
                     KEYCODES.update(list_keycode_name(virtualkey, keycode))
                     # KEYCODES[virtualkey] = keycode
             else:
@@ -355,7 +392,7 @@ def get_layout_data(virtual_key_defs_lang):
                     if not dead:
                         HIGHER_ASCII[letter] = keycode
                     else:
-                        echoF("dead", key_info)
+                        echoD("dead", key_info)
                     KEYCODES.update(list_keycode_name(virtualkey, keycode))
                     # KEYCODES[virtualkey] = keycode
                 else:
@@ -430,6 +467,7 @@ def get_layout_data(virtual_key_defs_lang):
 
 
 def make_layout_file(layout_data):
+    """make the layout file contents"""
     output_file_data = (
         COMMON_HEADER_COPYRIGHT
         + "from keyboard_layout import KeyboardLayoutBase\n"
@@ -461,32 +499,29 @@ def make_layout_file(layout_data):
     )
     for k, c in layout_data.high.items():
         output_file_data += f"        {repr(k)}: 0x{c:02x},\n"
-    output_file_data += (
-        "    }\n"
-        "    COMBINED_KEYS = {\n"
-    )
+    output_file_data += "    }\n" "    COMBINED_KEYS = {\n"
     for k, c in layout_data.combined.items():
         first, second, altgr = c
         second = ord(second) | altgr
         output_file_data += (
             f"        {repr(k)}: "
-            f"b\"\\x{first:02x}\\x{second:02x}\","
+            f'b"\\x{first:02x}\\x{second:02x}",'
             "\n"
         )
-    output_file_data += (
-        "    }\n"
-    )
+    output_file_data += "    }\n"
     return output_file_data
 
+
 def output_layout_file(output_file, output_file_data):
+    """write out the layout file"""
     with open(output_file, "w") as fp:
         fp.write(output_file_data)
 
 
 def make_keycode_file(layout_data):
-    output_file_data = (
-        COMMON_HEADER_COPYRIGHT + "class Keycode:\n"
-    )
+    """make the keycode file contents"""
+    output_file_data = COMMON_HEADER_COPYRIGHT + "class Keycode:\n"
+
     def ck(x):
         l = x[0]
         if len(l) == 2:
@@ -494,7 +529,8 @@ def make_keycode_file(layout_data):
         if len(l) > 5:
             l = l.ljust(20)
         return (len(l), l)
-    for name,code in natsort.natsorted(layout_data.keycodes.items(), key=ck):
+
+    for name, code in natsort.natsorted(layout_data.keycodes.items(), key=ck):
         # code = layout_data.keycodes[name]
         if name[0] != "_":
             output_file_data += f"    {name} = 0x{code:02x}\n"
@@ -509,21 +545,45 @@ def make_keycode_file(layout_data):
     """
     return output_file_data
 
+
 def output_keycode_file(output_file, output_file_data):
+    """write out the keycode file"""
     with open(output_file, "w") as fp:
         fp.write(output_file_data)
 
 
 @click.group(invoke_without_command=True)
-@click.option("--keyboard", "-k", required=True)
-@click.option("--lang", "-l", default="")
-@click.option("--platform", "-p", default="win")
-@click.option("--output", "-o", is_flag=True)
-@click.option("--output-layout", default="")
-@click.option("--output-keycode", default="")
-@click.option("--debug", "-d", type=click.INT, default=1)
+@click.option(
+    "--keyboard", "-k", required=True,
+    help="The XML layout file, or URL to the layout on kbdlayout.info."
+)
+@click.option(
+    "--lang", "-l", default="",
+    help="The language string to use in the output file name, defaults to the last part of the file name or the language part of the URL."
+)
+@click.option(
+    "--platform", "-p", default="win",
+    help="The platform string to use in the output file name. Only windows currently."
+)
+@click.option(
+    "--output", "-o", is_flag=True,
+    help="Activate writing out the layout and keycode files."
+)
+@click.option(
+    "--output-layout", default="",
+    help="Override the layout output file path and name."
+)
+@click.option(
+    "--output-keycode", default="",
+    help="Override the keycode output file path and name."
+)
+@click.option(
+    "--debug", "-d", default=1,
+    help="Set the debug level, -1 (dev only), 0 (silent), 1 (errors), 2 (all), default is 1"
+)
 @click.option("--show", "-s", default="")
 def main(keyboard, lang, platform, output, output_layout, output_keycode, debug, show):
+    """Make keyboard layout files from layout XML data."""
     global DEBUG_LEVEL
     DEBUG_LEVEL = debug
     echo(">", keyboard, fg="green")
@@ -583,6 +643,7 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
         output_keycode_file(output_keycode, data_keycode)
     if show == "keycode" or show == "s":
         print(data_keycode)
+
 
 if __name__ == "__main__":
     main()
