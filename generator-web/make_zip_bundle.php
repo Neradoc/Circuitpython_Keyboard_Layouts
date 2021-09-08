@@ -62,7 +62,7 @@ if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m
 }
 
 $layout_out = array();
-$layout_command = "python3 -m generator --keyboard ".$filepath_xml." -v layout";
+$layout_command = "python3 -m generator --keyboard ".$filepath_xml." --show layout";
 exec($layout_command, $layout_out, $result_code);
 $layout = join("\n", $layout_out);
 if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
@@ -70,7 +70,7 @@ if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
 $layout = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $layout);
 
 $keycodes_out = array();
-$keycodes_command = "python3 -m generator --keyboard ".$filepath_xml." -v keycode";
+$keycodes_command = "python3 -m generator --keyboard ".$filepath_xml." --show keycode";
 exec($keycodes_command, $keycodes_out, $result_code);
 $keycodes = join("\n", $keycodes_out);
 if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }

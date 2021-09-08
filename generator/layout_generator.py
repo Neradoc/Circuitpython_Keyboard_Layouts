@@ -522,8 +522,8 @@ def output_keycode_file(output_file, output_file_data):
 @click.option("--output-layout", default="")
 @click.option("--output-keycode", default="")
 @click.option("--debug", "-d", type=click.INT, default=1)
-@click.option("--verbose", "-v", default="")
-def main(keyboard, lang, platform, output, output_layout, output_keycode, debug, verbose):
+@click.option("--show", "-s", default="")
+def main(keyboard, lang, platform, output, output_layout, output_keycode, debug, show):
     global DEBUG_LEVEL
     DEBUG_LEVEL = debug
     echo(">", keyboard, fg="green")
@@ -561,9 +561,12 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
             output_layout = os.path.join(
                 BUILD_DIR, f"keyboard_layout_{platform.lower()}_{lang.lower()}.py"
             )
-        echo(f"Write to {output_layout}", fg="cyan")
+        if not show:
+            echoE(f"Write to {output_layout}", fg="cyan")
+        else:
+            echo(f"Write to {output_layout}", fg="cyan")
         output_layout_file(output_layout, data_layout)
-    if verbose == "layout" or verbose == "v":
+    if show == "layout" or show == "s":
         print(data_layout)
 
     data_keycode = make_keycode_file(layout_data)
@@ -573,9 +576,12 @@ def main(keyboard, lang, platform, output, output_layout, output_keycode, debug,
             output_keycode = os.path.join(
                 BUILD_DIR, f"keycode_{platform.lower()}_{lang.lower()}.py"
             )
-        echo(f"Write to {output_keycode}", fg="cyan")
+        if not show:
+            echoE(f"Write to {output_keycode}", fg="cyan")
+        else:
+            echo(f"Write to {output_keycode}", fg="cyan")
         output_keycode_file(output_keycode, data_keycode)
-    if verbose == "keycode" or verbose == "v":
+    if show == "keycode" or show == "s":
         print(data_keycode)
 
 if __name__ == "__main__":
