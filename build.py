@@ -88,19 +88,19 @@ MPYCROSS_URL = "https://adafruit-circuit-python.s3.amazonaws.com/bin/mpy-cross/"
 MPYCROSSES = {
     "darwin": {
         "mpy6": "mpy-cross-macos-catalina-6.3.0",
-        "mpy7": "mpy-cross-macos-universal-7.0.0-alpha.4",
+        "mpy7": "mpy-cross-macos-universal-7.0.0-rc.1",
     },
     "linux": {
         "mpy6": "mpy-cross.static-amd64-linux-6.3.0",
-        "mpy7": "mpy-cross.static-amd64-linux-7.0.0-alpha.4",
+        "mpy7": "mpy-cross.static-amd64-linux-7.0.0-rc.1",
     },
     "win32": {
         "mpy6": "mpy-cross.static-x64-windows-6.3.0.exe",
-        "mpy7": "mpy-cross.static-x64-windows-7.0.0-alpha.4.exe",
+        "mpy7": "mpy-cross.static-x64-windows-7.0.0-rc.1.exe",
     },
     "raspbian": {
         "mpy6": "mpy-cross.static-raspbian-6.3.0",
-        "mpy7": "mpy-cross.static-raspbian-7.0.0-alpha.4",
+        "mpy7": "mpy-cross.static-raspbian-7.0.0-rc.1",
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
