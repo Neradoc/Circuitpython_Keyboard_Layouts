@@ -2,11 +2,20 @@
 
 The goal of this repository is to contain a list of keyboard layouts for use with the Circuitpython [`adafruit_hid`](https://github.com/adafruit/Adafruit_CircuitPython_HID) library, that can be used as a reference for international keyboards and can be distributed as a "bundle" in the style of the Adafruit bundle.
 
-It is intended to be compatible with circup for easy installation with a command like this, once circup supports third-party bundles.
+It can be used with circup for easy installation.
 
 ```
-circup install keyboard_layout_win_fr
+circup bundle-add Neradoc/Circuitpython_Keyboard_Layouts
+circup install keyboard_layout_win_fr keycode_win_fr
 ```
+
+## Install your language
+
+To install both the layout and keycode files for your language, you need to copy 3 files to your board, in the **lib** directory of the drive. Pick the language and platforms that match yours. Use the `.py` or the `.mpy` version matching your version of Circuitpython.
+
+- `keyboard_layout.mpy` (support file)
+- `keyboard_layout_win_fr.mpy` (pick your platform/language)
+- `keycode_win_fr.mpy` (pick your platform/language)
 
 ### Layouts
 
