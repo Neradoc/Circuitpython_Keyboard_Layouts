@@ -16,36 +16,43 @@ https://www.neradoc.me/layouts/
 
 ## Now you have a zip file
 
-#### Find your language/layout in the lib directory 
+### Find your language/layout in the lib directory 
 
 For a language `LANG`, copy the following files from the zip's `lib` folder to the `lib` folder of the board.  
 *DO NOT* change the names or extensions of the files. Just pick the right ones.  
-Replace LANG with the letters for your language of choice.
+Replace `LANG` with the letters for your language of choice.
 
 - `keyboard_layout.py`
 - `keyboard_layout_win_LANG.py`
 - `keycode_win_LANG.py`
 
-#### Modify the pico-ducky code to use your language file:
+Don't forget to get [the adafruit_hid library](https://github.com/adafruit/Adafruit_CircuitPython_HID/releases/latest).
 
-At the start of the file replace:
+This is what it should look like **if your language is French for example**.
+
+![CIRCUITPY drive screenshot](docs/drive_pico_ducky.png)
+
+### Modify the pico-ducky code to use your language file:
+
+At the start of the file replace these lines:
 
 ```py
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 ```
 
-With this. Change `LANG` for you language, so the module names match the files without the extension.
+With this lines:  
+*Replace `LANG` with the letters for your language of choice. The name must match the file (without the py or mpy extension).*
 ```py
 from keyboard_layout_win_LANG import KeyboardLayout
 from keycode_win_LANG import Keycode
 ```
 
-And also replace:
+And also replace this line:
 ```py
 layout = KeyboardLayoutUS(kbd)
 ```
-With:
+With this line:
 ```py
 layout = KeyboardLayout(kbd)
 ```
