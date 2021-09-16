@@ -18,8 +18,9 @@ https://www.neradoc.me/layouts/
 
 ### Find your language/layout in the lib directory 
 
-For a language `LANG`, copy the following files from the zip's `lib` folder to the `lib` folder of the board.  
-*DO NOT* change the names or extensions of the files. Just pick the right ones.  
+For a language `LANG`, copy the following files from the zip's `lib` folder to the `lib` directory of the board.  
+**DO NOT** modify the adafruit_hid directory. Your files go directly in `lib`.  
+**DO NOT** change the names or extensions of the files. Just pick the right ones.  
 Replace `LANG` with the letters for your language of choice.
 
 - `keyboard_layout.py`
