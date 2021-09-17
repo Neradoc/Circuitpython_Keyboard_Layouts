@@ -148,9 +148,9 @@ class KeyboardLayout(KeyboardLayoutBase):
         b'\xa2'    # [
         b'\xb7'       # bslash
         b'\xad'    # ]
-        b'\x2F'       # ^
+        b'\x00'       # ^
         b'\xaE'       # _
-        b'\x31'    # `
+        b'\x00'    # `
         b'\x14'       # a
         b'\x05'       # b
         b'\x06'       # c
@@ -180,7 +180,7 @@ class KeyboardLayout(KeyboardLayoutBase):
         b'\x22'    # {
         b'\x1f'    # |
         b'\x2d'    # }
-        b'\x11'    # ~ TODO
+        b'\x00'    # ~
         b'\x00'       # DEL
     )
 
@@ -194,6 +194,45 @@ class KeyboardLayout(KeyboardLayoutBase):
         "€": 0x30,  # € - altgr will be added thanks to NEED_ALTGR
         "°": 0xAD,  # °
         "§": 0x23,  # §
-        #  TODO: add missing ÀÈÉÙ
+    }
+    COMBINED_KEYS = {
+        'ã': b"\x11\xe1",
+        'Ã': b"\x11\xc1",
+        'ñ': b"\x11\xee",
+        'Ñ': b"\x11\xce",
+        'õ': b"\x11\xef",
+        'Õ': b"\x11\xcf",
+        '~': b"\x11\xa0",
+        'Ù': b"\x31\x55",
+        '`': b"\x31\x20",
+        'ì': b"\x31\x69",
+        'Ì': b"\x31\x49",
+        'ò': b"\x31\x6f",
+        'Ò': b"\x31\x4f",
+        'À': b"\x31\x41",
+        'È': b"\x31\x45",
+        'â': b"\x2f\x61",
+        'ê': b"\x2f\x65",
+        'î': b"\x2f\x69",
+        'ô': b"\x2f\x6f",
+        'û': b"\x2f\x75",
+        'Â': b"\x2f\x41",
+        'Ê': b"\x2f\x45",
+        'Î': b"\x2f\x49",
+        'Ô': b"\x2f\x4f",
+        'Û': b"\x2f\x55",
+        '^': b"\x2f\x20",
+        'ä': b"\xaf\x61",
+        'ë': b"\xaf\x65",
+        'ï': b"\xaf\x69",
+        'ö': b"\xaf\x6f",
+        'ü': b"\xaf\x75",
+        'ÿ': b"\xaf\x79",
+        'Ä': b"\xaf\x41",
+        'Ë': b"\xaf\x45",
+        'Ï': b"\xaf\x49",
+        'Ö': b"\xaf\x4f",
+        'Ü': b"\xaf\x55",
+        '¨': b"\xaf\x20",
     }
 
