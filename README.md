@@ -9,6 +9,8 @@ circup bundle-add Neradoc/Circuitpython_Keyboard_Layouts
 circup install keyboard_layout_win_fr keycode_win_fr
 ```
 
+NOTE: for pico-ducky users, [there's a dedicated guide](PICODUCKY.md).
+
 ## Install your language
 
 To install both the layout and keycode files for your language, you need to copy 3 files to your board, in the **lib** directory of the drive. Pick the language and platforms that match yours. Use the `.py` or the `.mpy` version matching your version of Circuitpython.
