@@ -194,6 +194,7 @@ class KeyboardLayout(KeyboardLayoutBase):
         "€": 0x30,  # € - altgr will be added thanks to NEED_ALTGR
         "°": 0xAD,  # °
         "§": 0x23,  # §
+        "£": 0xB1,  # £
     }
     COMBINED_KEYS = {
         'ã': b"\x11\xe1",
