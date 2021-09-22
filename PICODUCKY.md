@@ -6,7 +6,7 @@ How to use one of these layouts with the pico-ducky repository.
 
 Download the `py` zip, named `circuitpython-keyboard-layouts-py-XXXXXXXX.zip`
 
-*You can use the mpy version targetting the version of Circuitpython that is on the device, but on Raspberry Pi Pico you don't need it - they only reduce file size and memory use on load, which the pico has plenty of.*
+**NOTE: You can use the mpy version targetting the version of Circuitpython that is on the device, but on Raspberry Pi Pico you don't need it - they only reduce file size and memory use on load, which the pico has plenty of.**
 
 ## If your language/layout is not in the bundle
 
