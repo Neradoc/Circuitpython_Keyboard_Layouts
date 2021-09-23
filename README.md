@@ -13,11 +13,15 @@ NOTE: for pico-ducky users, [there's a dedicated guide](PICODUCKY.md).
 
 ## Install your language
 
-To install both the layout and keycode files for your language, you need to copy 3 files to your board, in the **lib** directory of the drive. Pick the language and platforms that match yours. Use the `.py` or the `.mpy` version matching your version of Circuitpython.
+To install both the layout and keycode files for your language, you need to copy 3 files to your board. Pick the language and platforms that match yours. Use the `.py` version, or the `.mpy` version matching your version of Circuitpython. The mpy files take less space and are better suited for Circuitpython boards with less than 1MB of drive.
 
 - `keyboard_layout.mpy` (support file)
 - `keyboard_layout_win_fr.mpy` (pick your platform/language)
 - `keycode_win_fr.mpy` (pick your platform/language)
+
+The files go directly in the directory called "**lib**" on the board.
+
+![CIRCUITPY drive screenshot](docs/drive_generic.png)
 
 ### Layouts
 
