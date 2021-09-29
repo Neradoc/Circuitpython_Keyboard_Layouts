@@ -505,7 +505,7 @@ def make_layout_file(layout_data):
         second = ord(second) | altgr
         output_file_data += (
             f"        {repr(k)}: "
-            f'b"\\x{first:02x}\\x{second:02x}",'
+            f'0x{first:02x}{second:02x},'
             "\n"
         )
     output_file_data += "    }\n"

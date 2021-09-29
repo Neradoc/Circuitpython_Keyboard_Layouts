@@ -67,8 +67,8 @@ class KeyboardLayoutBase:
             # find combined keys
             elif char in self.COMBINED_KEYS:
                 cchar = self.COMBINED_KEYS[char]
-                self._write(char, cchar[0], cchar[1] & self.ALTGR_FLAG)
-                char = chr(cchar[1] & (~self.ALTGR_FLAG))
+                self._write(char, (cchar >> 8), (cchar & 0xFF & self.ALTGR_FLAG))
+                char = chr(cchar & 0xFF & (~self.ALTGR_FLAG))
                 keycode = self._char_to_keycode(char)
                 # assume no altgr needed for second key
                 self._write(char, keycode, False)
