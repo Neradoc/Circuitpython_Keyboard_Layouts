@@ -20,7 +20,7 @@ echo "##########################################################"
 echo "# DE        ##############################################"
 python3 -m generator -k _xml/win/kbdlayout-info-de.xml -o
 echo "# LAYOUT    ##############################################"
-python3 tests/compare_layouts.py -l new -r old _build/generated/keyboard_layout_win_de.py libraries/layouts/keyboard_layout_win_de_de.py
+python3 tests/compare_layouts.py -l new -r old _build/generated/keyboard_layout_win_de.py libraries/layouts/keyboard_layout_win_de.py
 
 echo "##########################################################"
 echo "# CZ        ##############################################"
