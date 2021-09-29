@@ -90,7 +90,7 @@ class Keycode:
     CAPS_LOCK = 0x39
     COMMAND = 0xe3
     CONTROL = 0xe0
-    Circumflex = 0x20
+    CIRCUMFLEX = 0x20
     DELETE = 0x4c
     DOWN_ARROW = 0x51
     EQUALS = 0x2e

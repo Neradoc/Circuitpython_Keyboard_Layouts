@@ -86,7 +86,7 @@ class Keycode:
     SPACE = 0x2c
     THREE = 0x20
     APPLICATION = 0x65
-    BACKSLASH = 0x35
+    BACKSLASH = 0x2d
     BACKSPACE = 0x2a
     CAPS_LOCK = 0x39
     COMMAND = 0xe3
@@ -95,6 +95,7 @@ class Keycode:
     DOWN_ARROW = 0x51
     EQUALS = 0x30
     ESCAPE = 0x29
+    ESZETT = 0x2d
     FORWARD_SLASH = 0x31
     GRAVE_ACCENT = 0x33
     GRAVIS = 0x2e
@@ -117,7 +118,6 @@ class Keycode:
     KEYPAD_ZERO = 0x62
     LEFT_ALT = 0xe2
     LEFT_ARROW = 0x50
-    LEFT_BRACKET = 0x2d
     LEFT_CONTROL = 0xe0
     LEFT_GUI = 0xe3
     LEFT_SHIFT = 0xe1
