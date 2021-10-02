@@ -64,9 +64,9 @@ class KeyboardLayoutBase:
             if keycode > 0:
                 self._write(keycode, char in self.NEED_ALTGR)
             # find combined keys
-            elif char in self.COMBINED_KEYS:
+            elif ord(char) in self.COMBINED_KEYS:
                 # first key (including shift bit)
-                cchar = self.COMBINED_KEYS[char]
+                cchar = self.COMBINED_KEYS[ord(char)]
                 self._write(cchar >> 8, cchar & self.ALTGR_FLAG)
                 # second key (removing the altgr bit)
                 char = chr(cchar & 0xFF & (~self.ALTGR_FLAG))

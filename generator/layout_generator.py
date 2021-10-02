@@ -498,14 +498,20 @@ def make_layout_file(layout_data):
         "    HIGHER_ASCII = {\n"
     )
     for k, c in layout_data.high.items():
-        output_file_data += f"        {repr(k)}: 0x{c:02x},\n"
+        output_file_data += (
+            f"        0x{ord(k):02x}:"
+            f" 0x{c:02x},"
+            f"  # {repr(k)}"
+            "\n"
+        )
     output_file_data += "    }\n" "    COMBINED_KEYS = {\n"
     for k, c in layout_data.combined.items():
         first, second, altgr = c
         second = ord(second) | altgr
         output_file_data += (
-            f"        {repr(k)}: "
-            f'0x{first:02x}{second:02x},'
+            f"        0x{ord(k):02x}:"
+            f' 0x{first:02x}{second:02x},'
+            f"  # {repr(k)}"
             "\n"
         )
     output_file_data += "    }\n"

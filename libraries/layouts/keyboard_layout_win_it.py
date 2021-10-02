@@ -144,17 +144,17 @@ class KeyboardLayout(KeyboardLayoutBase):
     )
     NEED_ALTGR = '#@[]€'
     HIGHER_ASCII = {
-        '£': 0xa0,
-        '€': 0x22,
-        'ì': 0x2e,
-        'è': 0x2f,
-        'é': 0xaf,
-        'ò': 0x33,
-        'ç': 0xb3,
-        'à': 0x34,
-        '°': 0xb4,
-        'ù': 0x31,
-        '§': 0xb1,
+        0xa3: 0xa0,  # '£'
+        0x20ac: 0x22,  # '€'
+        0xec: 0x2e,  # 'ì'
+        0xe8: 0x2f,  # 'è'
+        0xe9: 0xaf,  # 'é'
+        0xf2: 0x33,  # 'ò'
+        0xe7: 0xb3,  # 'ç'
+        0xe0: 0x34,  # 'à'
+        0xb0: 0xb4,  # '°'
+        0xf9: 0x31,  # 'ù'
+        0xa7: 0xb1,  # '§'
     }
     COMBINED_KEYS = {
     }
