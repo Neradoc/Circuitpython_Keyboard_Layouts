@@ -7,7 +7,7 @@
 """
 
 
-__version__ = "2.0.0-auto.0"
+__version__ = "3.0.0-auto.0"
 __repo__ = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
 
@@ -109,10 +109,10 @@ class KeyboardLayoutBase:
         :param char_val: ascii char value
         :return: keycode, with modifiers if needed
         """
-        if char in self.HIGHER_ASCII:
-            return self.HIGHER_ASCII[char]
         if ord(char) in self.HIGHER_ASCII:
             return self.HIGHER_ASCII[ord(char)]
+        if char in self.HIGHER_ASCII:
+            return self.HIGHER_ASCII[char]
         return 0
 
     def _char_to_keycode(self, char):
