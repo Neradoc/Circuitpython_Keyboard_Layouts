@@ -178,7 +178,7 @@ class KeyboardLayout(KeyboardLayoutBase):
         b'\x1c'       # y
         b'\x1a'       # z
         b'\x22'    # {
-        b'\x1f'    # |
+        b'\x8f'    # |
         b'\x2d'    # }
         b'\x00'    # ~
         b'\x00'       # DEL
