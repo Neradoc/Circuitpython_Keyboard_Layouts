@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 """
+`keyboard_layout.KeyboardLayoutBase`
+=======================================================
+
 * Author(s): Dan Halbert, AngainorDev, Neradoc
 """
 
@@ -43,7 +46,7 @@ class KeyboardLayoutBase:
 
     def _write(self, keycode, altgr=False):
         """Type a key combination based on shift bit and altgr bool
-        
+
         :param keycode: int value of the keycode, with the shift bit.
         :param altgr: bool indicating if the altgr key should be pressed too.
         """

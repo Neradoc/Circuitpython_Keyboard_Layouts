@@ -13,9 +13,8 @@ NOTE: for pico-ducky users, [there's a dedicated guide](PICODUCKY.md).
 
 ## Install your language
 
-To install both the layout and keycode files for your language, you need to copy 3 files to your board. Pick the language and platforms that match yours. Use the `.py` version, or the `.mpy` version matching your version of Circuitpython. The mpy files take less space and are better suited for Circuitpython boards with less than 1MB of drive.
+To install both the layout and keycode files for your language, you need to copy 2 files to your board. Pick the language and platforms that match yours. Use the `.py` version, or the `.mpy` version matching your version of Circuitpython. The mpy files take less space and are better suited for Circuitpython boards with less than 1MB of drive.
 
-- `keyboard_layout.mpy` (support file)
 - `keyboard_layout_win_fr.mpy` (pick your platform/language)
 - `keycode_win_fr.mpy` (pick your platform/language)
 
@@ -29,7 +28,7 @@ Don't forget to also install [the adafruit_hid library](https://github.com/adafr
 
 ### Layouts
 
-Layouts require first installing the `keyboard_layout` module (`keyboard_layout.mpy` in the bundle zip), containing the base class for the layouts. This file should be part of adafruit_hid in the future and will then be removed.
+Layouts require the **latest** version of the `adafruit_hid` library (at least 5.x.x).
 
 For the plaform **platform** (win, mac) and the layout language **lang**. The module `keyboard_layout_platform_lang` has a class called `KeyboardLayout`. It contains the layout information for use with the `Keyboard` to type text.
 
