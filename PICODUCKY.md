@@ -1,5 +1,7 @@
 How to use one of these layouts with the pico-ducky repository.
 
+## First step
+
 #### Go to the [latest release page](https://github.com/Neradoc/Circuitpython_Keyboard_Layouts/releases/latest), look if your language is in the list.
 
 ## If your language/layout is in the bundle
