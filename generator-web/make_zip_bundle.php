@@ -3,6 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+ob_start();
 $ERRORS = [];
 
 $source_url = "";
@@ -50,19 +51,28 @@ if( preg_match(",^https://kbdlayout.info/kbd([a-zA-Z0-9_-]+)$,", $source_url, $m
 
 	$data = file_get_contents($fileurl);
 	if( strlen($data) > 1000000 ) {
-		die("source URL file too big");
+		$ERRORS[] = "Source URL file too big.";
+	} else {
+		file_put_contents($filepath_xml, $data);
 	}
-	file_put_contents($filepath_xml, $data);
 
 } else {
+	$ERRORS[] = "The source could not be interpreted, or is not supported, check the spelling.";
+}
+
+if(count($ERRORS) > 0) {
 	# other platforms or sources
 	header("HTTP/1.1 500 Internal Server Error");
-	print("<pre>The source could not be interpreted, or is not supported, check the spelling.\n".htmlentities($source_url)."</pre>");
+	print("<pre>");
+	print(join("\n", $ERRORS));
+	print(htmlentities($source_url));
+	print("</pre>");
+	ob_end_flush();
 	exit(0);
 }
 
 $layout_out = array();
-$layout_command = "python3 -m generator --keyboard ".$filepath_xml." --show layout";
+$layout_command = "python3 -m generator --keyboard ".$filepath_xml." --show layout -d0 2>&1";
 exec($layout_command, $layout_out, $result_code);
 $layout = join("\n", $layout_out);
 if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
@@ -70,7 +80,7 @@ if($result_code != 0) { $ERRORS[] = "Error Layout\n"; }
 $layout = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $layout);
 
 $keycodes_out = array();
-$keycodes_command = "python3 -m generator --keyboard ".$filepath_xml." --show keycode";
+$keycodes_command = "python3 -m generator --keyboard ".$filepath_xml." --show keycode -d0 2>&1";
 exec($keycodes_command, $keycodes_out, $result_code);
 $keycodes = join("\n", $keycodes_out);
 if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }
@@ -183,7 +193,12 @@ if( count($ERRORS) > 0 ) {
 	print(htmlentities($source_url)."\n");
 	print(htmlentities($filepath_xml)."\n");
 	print(join("\n", $ERRORS));
+	if($debug) {
+		print_r($layout_out);
+		print_r($keycodes_out);
+	}
 	print("\n</pre>");
+	ob_end_flush();
 } else {
 	make_zip($layout, $keycodes, $cpversion, $platform, $lang);
 }
