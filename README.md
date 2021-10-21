@@ -23,6 +23,8 @@ The files go directly in the directory called "**lib**" on the board.
 
 ![CIRCUITPY drive screenshot](docs/drive_generic.png)
 
+## Use the libraries
+
 ### Layouts
 
 Layouts require first installing the `keyboard_layout` module (`keyboard_layout.mpy` in the bundle zip), containing the base class for the layouts. This file should be part of adafruit_hid in the future and will then be removed.
@@ -58,16 +60,12 @@ else:
 kbd.send(Keycode.COMMAND, Keycode.A)
 ```
 
-### Helpers
+## Helpers
 
 The `consumer_control_extended` module brings a big list of names for the consumer controls page in the HID specs, to be used with `adafruit_hid.consumer_control`.
 
-### The Layout Generator
+## The Layout Generator
 
 This needs to be further documentend, but for now `tests/make_validated.sh` shows an example of how to use it. There is a live version of the web generator, though it might not always be the current release.
 
 https://www.neradoc.me/layouts/
-
-### NOTE
-
-A few layouts and keycodes are currently implemented, they are not thouroughly tested. The `keycode_mac_fr.py` file is more experimental.
