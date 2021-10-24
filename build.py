@@ -288,16 +288,20 @@ def make_the_mpy_bundles():
             os.chmod(cross_file, fstats.st_mode | stat.S_IEXEC)
 
     # duplicate the py dir to mpy6 and mpy7
+    pwd = os.getcwd()
     for platform in PLATFORMS:
         cross = os.path.join(BUILD_DEPS, MPYCROSS[platform])
+        cross = os.path.abspath(cross)
         bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
         lib_dir = BUNDLE_LIB_DIR.format(platform=PLATFORM_NAMES[platform])
         shutil.copytree(fmt(BUNDLE_DIR), bun_dir)
         # run mpy-cross in each of those
-        for lib_file in glob.glob(os.path.join(lib_dir, "*.py")):
+        os.chdir(lib_dir)
+        for lib_file in glob.glob(os.path.join("*.py")):
             mpy_file = lib_file.replace(".py", ".mpy")
             subprocess.call([cross, lib_file, "-o", mpy_file])
             os.unlink(lib_file)
+        os.chdir(pwd)
 
 
 def do_the_zips():
