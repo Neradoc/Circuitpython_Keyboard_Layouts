@@ -21,7 +21,9 @@ To install both the layout and keycode files for your language, you need to copy
 
 The files go directly in the directory called "**lib**" on the board.
 
-![CIRCUITPY drive screenshot](docs/drive_generic.png)
+![CIRCUITPY drive screenshot](docs/drive_generic-nohid.png)
+
+Don't forget to also install [the adafruit_hid library](https://github.com/adafruit/Adafruit_CircuitPython_HID/releases/latest) in the lib directory.
 
 ## Use the libraries
 

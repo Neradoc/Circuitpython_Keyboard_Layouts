@@ -29,11 +29,11 @@ Replace `LANG` with the letters for your language of choice.
 - `keyboard_layout_win_LANG.py`
 - `keycode_win_LANG.py`
 
-Don't forget to get [the adafruit_hid library](https://github.com/adafruit/Adafruit_CircuitPython_HID/releases/latest).
-
 This is what it should look like **if your language is French for example**.
 
-![CIRCUITPY drive screenshot](docs/drive_pico_ducky.png)
+![CIRCUITPY drive screenshot](docs/drive_pico_ducky-nohid.png)
+
+Don't forget to also install [the adafruit_hid library](https://github.com/adafruit/Adafruit_CircuitPython_HID/releases/latest) in the lib directory.
 
 ### Modify the pico-ducky code to use your language file:
 
