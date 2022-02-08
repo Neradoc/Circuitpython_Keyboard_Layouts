@@ -260,11 +260,6 @@ def make_bundle_files():
             "dependencies": [],  # "adafruit_hid"
             "external_dependencies": ["adafruit-circuitpython-hid"],
         }
-        # add the dependency to keyboard_layout
-        if module_name.startswith("keyboard_layout_"):
-            json_data[module_name]["dependencies"].append("keyboard_layout")
-            with open(target, "a") as fp:
-                fp.write("\r\nkeyboard_layout\r\n")
 
     # create the json file
     with open(BUNDLE_JSON, "w") as out_file:
