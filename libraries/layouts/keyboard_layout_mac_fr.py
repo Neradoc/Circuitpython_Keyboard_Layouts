@@ -25,7 +25,7 @@
 * Author(s): Dan Halbert, Neradoc
 """
 
-from keyboard_layout import KeyboardLayoutBase
+from adafruit_hid.keyboard_layout_base import KeyboardLayoutBase
 
 
 __version__ = "1.0.0-auto.0"

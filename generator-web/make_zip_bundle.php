@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 ob_start();
 $ERRORS = [];
+$LAYOUT_BASE = false;
 
 $source_url = "";
 $platform = "win";
@@ -90,13 +91,15 @@ if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }
 
 $keycodes = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $keycodes);
 
-if( !file_exists("src/keyboard_layout6.mpy") ) {
-	exec("mpy-cross/mpy-cross.static-amd64-linux-6 src/keyboard_layout.py");
-	rename("src/keyboard_layout.mpy", "src/keyboard_layout6.mpy");
-}
-if( !file_exists("src/keyboard_layout7.mpy") ) {
-	exec("mpy-cross/mpy-cross.static-amd64-linux-7 src/keyboard_layout.py");
-	rename("src/keyboard_layout.mpy", "src/keyboard_layout7.mpy");
+if($LAYOUT_BASE) {
+	if( !file_exists("src/keyboard_layout6.mpy") ) {
+		exec("mpy-cross/mpy-cross.static-amd64-linux-6 src/keyboard_layout.py");
+		rename("src/keyboard_layout.mpy", "src/keyboard_layout6.mpy");
+	}
+	if( !file_exists("src/keyboard_layout7.mpy") ) {
+		exec("mpy-cross/mpy-cross.static-amd64-linux-7 src/keyboard_layout.py");
+		rename("src/keyboard_layout.mpy", "src/keyboard_layout7.mpy");
+	}
 }
 
 function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
@@ -142,11 +145,15 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 			$deletes[] = $tempfile;
 			$deletes[] = $mpyfile;
 			# layout base
-			$zip->addFile("src/keyboard_layout".$cpversion.".mpy", "keyboard_layout.mpy");
+			if($LAYOUT_BASE) {
+				$zip->addFile("src/keyboard_layout".$cpversion.".mpy", "keyboard_layout.mpy");
+			}
 		} else {
 			$zip->addFromString($layout_file, $layout);
 			$zip->addFromString($keycodes_file, $keycodes);
-			$zip->addFile("src/keyboard_layout.py", "keyboard_layout.py");
+			if($LAYOUT_BASE) {
+				$zip->addFile("src/keyboard_layout.py", "keyboard_layout.py");
+			}
 		}
 
 		$data = file_get_contents("src/sample_code_template.py");
