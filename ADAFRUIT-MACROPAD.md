@@ -20,9 +20,9 @@ The following is a guide on how to install and use other keyboard layouts from h
 1) Replace the `adafruit_macropad.mpy` file in the `lib` folder on the *Adafruit Macropad* with the `adafruit_macropad.py` file so we can edit the contents of this library file and change which keyboard layout is used. Delete the `adafruit_macropad.mpy` file and replace it with the `adafruit_macropad.py` file downloaded from https://raw.githubusercontent.com/adafruit/Adafruit_CircuitPython_MacroPad/main/adafruit_macropad.py (*right click* > *save as...*).
 2) Edit the `adafruit_macropad.py` file so the code uses the correct keyboard layout files.
    1) Replace the line `from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS` with `from keyboard_layout_win_XX import KeyboardLayout`. This makes sure the code imports the keyboard layout we just copied to the `.lib` folder.
-   2) Replace the line `self._keyboard_layout = KeyboardLayoutUS(self.keyboard)` with `self._keyboard_layout = KeyboardLayout(self.keyboard)`. This makes sure the code uses this new imported keyboard layout.
-3) Edit the files in the `macros` folder to use the correct `Keycode` file.
-   1) Replace the line `from adafruit_hid.keycode import Keycode` with `from keycode_win_XX import Keycode`. This makes sure the correct key-sequences are called when using the `Keycode.WINDOWS`, ... functionality to create macros.
+   3) Replace the line `self._keyboard_layout = KeyboardLayoutUS(self.keyboard)` with `self._keyboard_layout = KeyboardLayout(self.keyboard)`. This makes sure the code uses this newly imported keyboard layout.
+3) Edit the files in the `macros` folder to use the new `Keycode` file.
+   1) Replace the line `from adafruit_hid.keycode import Keycode` with `from keycode_win_XX import Keycode`. This makes sure the correct key-sequences are called when using the `Keycode.XXXXXX` functionality to create macros.
 
 <br/>
 
