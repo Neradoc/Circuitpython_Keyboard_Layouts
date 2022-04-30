@@ -9,7 +9,10 @@ circup bundle-add Neradoc/Circuitpython_Keyboard_Layouts
 circup install keyboard_layout_win_fr keycode_win_fr
 ```
 
-NOTE: for pico-ducky users, [there's a dedicated guide](PICODUCKY.md).
+There's a couple of project-specific guides:
+
+- [How to use the layouts with Adafruit's Macropad and the **Hotkeys** project](README-MACROPAD.md).
+- [For pico-ducky users, there's a dedicated guide](PICODUCKY.md).
 
 ## Install your language
 
