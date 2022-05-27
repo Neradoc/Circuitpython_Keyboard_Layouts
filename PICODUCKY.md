@@ -12,7 +12,7 @@ Download the `py` zip, named `circuitpython-keyboard-layouts-py-XXXXXXXX.zip`
 
 ## If your language/layout is not in the bundle
 
-Try the online generator, it should get you a zip file with the bundles for yout language
+Try the online generator, it should get you a zip file with the bundles for your language
 
 https://www.neradoc.me/layouts/
 
