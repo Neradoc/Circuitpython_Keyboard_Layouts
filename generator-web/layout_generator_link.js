@@ -12,6 +12,7 @@ function download_layout() {
         { extension: ".py", extout: ".py", id: "", version: "py" },
         { extension: "6.mpy", extout: ".mpy", id: "6", version: "mpy6" },
         { extension: "7.mpy", extout: ".mpy", id: "7", version: "mpy7" },
+        { extension: "8.mpy", extout: ".mpy", id: "8", version: "mpy8" },
     ];
     for( z in zips ) {
         var zipper = zips[z];
@@ -22,7 +23,7 @@ function download_layout() {
 
         //
         $("#download_link"+zipper.id).attr("href", zurl);
-        // $("#download_link"+zipper.id).attr("download", zip_file);
+        //$("#download_link"+zipper.id).attr("download", zip_file);
         $("#download_link"+zipper.id).attr("title", zip_file);
         $("#download_link"+zipper.id).show();
     }

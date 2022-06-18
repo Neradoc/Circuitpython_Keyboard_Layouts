@@ -449,6 +449,7 @@ function download_layout() {
             { extension: ".py", extout: ".py", id: "", version: "py" },
             { extension: "6.mpy", extout: ".mpy", id: "6", version: "mpy6" },
             { extension: "7.mpy", extout: ".mpy", id: "7", version: "mpy7" },
+            { extension: "8.mpy", extout: ".mpy", id: "8", version: "mpy8" },
         ];
         for( z in zips ) {
             (() => {
@@ -463,6 +464,7 @@ function download_layout() {
                 var base_layout_local = BASE_LAYOUT_NAME.replace("{}", zipper.extension);
                 var base_layout_file = BASE_DIR + base_layout_local;
                 $.get(base_layout_file, (data) => {
+                	console.log(base_layout_name);
                     outputZip.file(base_layout_name, data);
                     outputZip.generateAsync({type:"base64"}).then(function (base64) {
                         zip_data = "data:application/zip;base64," + base64;

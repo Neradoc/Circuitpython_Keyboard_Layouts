@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 ob_start();
 $ERRORS = [];
-$LAYOUT_BASE = false;
+define("LAYOUT_BASE", false);
 
 $source_url = "";
 $platform = "win";
@@ -91,7 +91,7 @@ if($result_code != 0) { $ERRORS[] = "Error Keycodes\n"; }
 
 $keycodes = preg_replace("/".preg_quote($VERSION0)."/", $VERSION, $keycodes);
 
-if($LAYOUT_BASE) {
+if(LAYOUT_BASE) {
 	if( !file_exists("src/keyboard_layout6.mpy") ) {
 		exec("mpy-cross/mpy-cross.static-amd64-linux-6 src/keyboard_layout.py");
 		rename("src/keyboard_layout.mpy", "src/keyboard_layout6.mpy");
@@ -99,6 +99,10 @@ if($LAYOUT_BASE) {
 	if( !file_exists("src/keyboard_layout7.mpy") ) {
 		exec("mpy-cross/mpy-cross.static-amd64-linux-7 src/keyboard_layout.py");
 		rename("src/keyboard_layout.mpy", "src/keyboard_layout7.mpy");
+	}
+	if( !file_exists("src/keyboard_layout8.mpy") ) {
+		exec("mpy-cross/mpy-cross.static-amd64-linux-8 src/keyboard_layout.py");
+		rename("src/keyboard_layout.mpy", "src/keyboard_layout8.mpy");
 	}
 }
 
@@ -110,6 +114,8 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 		$filepath_zip = "data/layout_files_".$platform."_".$lang."-6mpy.zip";
 	} elseif( $cpversion == "7" ) {
 		$filepath_zip = "data/layout_files_".$platform."_".$lang."-7mpy.zip";
+	} elseif( $cpversion == "8" ) {
+		$filepath_zip = "data/layout_files_".$platform."_".$lang."-8mpy.zip";
 	} else {
 		$filepath_zip = "data/layout_files_".$platform."_".$lang."-py.zip";
 	}
@@ -125,7 +131,7 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 		$layout_file = "keyboard_layout_" . $platform . "_" . $lang . ".py";
 		$keycodes_file = "keycode_" . $platform . "_" . $lang . ".py";
 		
-		if( $cpversion == "6" || $cpversion == "7" ) {
+		if( $cpversion == "6" || $cpversion == "7" || $cpversion == "8" ) {
 			# layout
 			$layout_name = preg_replace("/\.py$/", ".mpy", $layout_file);
 			$tempfile = "data/" . uniqid() . "_" . $layout_file;
@@ -145,13 +151,13 @@ function make_zip($layout, $keycodes, $cpversion, $platform, $lang) {
 			$deletes[] = $tempfile;
 			$deletes[] = $mpyfile;
 			# layout base
-			if($LAYOUT_BASE) {
+			if(LAYOUT_BASE) {
 				$zip->addFile("src/keyboard_layout".$cpversion.".mpy", "keyboard_layout.mpy");
 			}
 		} else {
 			$zip->addFromString($layout_file, $layout);
 			$zip->addFromString($keycodes_file, $keycodes);
-			if($LAYOUT_BASE) {
+			if(LAYOUT_BASE) {
 				$zip->addFile("src/keyboard_layout.py", "keyboard_layout.py");
 			}
 		}

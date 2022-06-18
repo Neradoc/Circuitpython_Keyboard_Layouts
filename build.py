@@ -75,11 +75,12 @@ REQUIREMENTS_FILE = "requirements-modules.txt"
 SET_VERSION_PATTERN = "\n__version__ = '{}'\n"
 THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
-PLATFORMS = ["mpy6", "mpy7"]
+PLATFORMS = ["mpy6", "mpy7", "mpy8"]
 PLATFORM_NAMES = {
     "py": "py",
     "mpy6": "6.x-mpy",
     "mpy7": "7.x-mpy",
+    "mpy8": "8.x-mpy",
 }
 
 # https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/
@@ -88,19 +89,23 @@ MPYCROSS_URL = "https://adafruit-circuit-python.s3.amazonaws.com/bin/mpy-cross/"
 MPYCROSSES = {
     "darwin": {
         "mpy6": "mpy-cross-macos-catalina-6.3.0",
-        "mpy7": "mpy-cross-macos-universal-7.0.0",
+        "mpy7": "mpy-cross-macos-universal-7.3.0",
+        "mpy8": "mpy-cross-macos-universal-8.0.0-alpha.1",
     },
     "linux": {
         "mpy6": "mpy-cross.static-amd64-linux-6.3.0",
-        "mpy7": "mpy-cross.static-amd64-linux-7.0.0",
+        "mpy7": "mpy-cross.static-amd64-linux-7.3.0",
+        "mpy8": "mpy-cross.static-amd64-linux-8.0.0-alpha.1",
     },
     "win32": {
         "mpy6": "mpy-cross.static-x64-windows-6.3.0.exe",
-        "mpy7": "mpy-cross.static-x64-windows-7.0.0.exe",
+        "mpy7": "mpy-cross.static-x64-windows-7.3.0.exe",
+        "mpy8": "mpy-cross.static-x64-windows-8.0.0-alpha.1.exe",
     },
     "raspbian": {
         "mpy6": "mpy-cross.static-raspbian-6.3.0",
-        "mpy7": "mpy-cross.static-raspbian-7.0.0",
+        "mpy7": "mpy-cross.static-raspbian-7.3.0",
+        "mpy8": "mpy-cross.static-raspbian-8.0.0-alpha.1",
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
@@ -282,7 +287,7 @@ def make_the_mpy_bundles():
             fstats = os.stat(cross_file)
             os.chmod(cross_file, fstats.st_mode | stat.S_IEXEC)
 
-    # duplicate the py dir to mpy6 and mpy7
+    # duplicate the py dir to mpy dirs
     pwd = os.getcwd()
     for platform in PLATFORMS:
         cross = os.path.join(BUILD_DEPS, MPYCROSS[platform])

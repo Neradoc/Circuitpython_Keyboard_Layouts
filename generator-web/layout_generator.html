@@ -51,17 +51,15 @@
 		.download_link#download_link
 		{
 			display: none;
-			width: calc(800px - 6 * 8px - 80px - 3px);
+			/* with - padding - spacing */
+			width: calc(800px - 16px - 3 * (40px + 16px + 1px) - 1px);
 		}
-		.download_link#download_link6
+		.download_link#download_link6,
+		.download_link#download_link7,
+		.download_link#download_link8
 		{
 			display: none;
-			width: calc(40px);
-		}
-		.download_link#download_link7
-		{
-			display: none;
-			width: calc(40px);
+			width: 40px;
 		}
 		#debug_area { display: none; }
 		#sample_code {
@@ -80,16 +78,18 @@
 <div id="content">
 <!-- <p class="warning">This will not work with browsers that block access to external sites from javascript.<br/>Oh well, I'll try something else...</p> -->
 <p>Generate a Windows keyboard layout for Circuitpython's <a href="https://circuitpython.readthedocs.io/projects/hid/en/latest/">adafruit_hid</a>.</p>
+<p>This is the online generator for the <a href="https://github.com/Neradoc/Circuitpython_Keyboard_Layouts">Circuitpython Keyboard Layouts</a> repository.</p>
 <ul>
 	<li>Go to <a target="_BLANK" href="https://kbdlayout.info/">kbdlayout.info</a> and find your layout's page.</li>
 	<li>Paste the url of the layout into the box below (see example).</li>
 	<li>Press the "Make Zip Bundle Links" button.</li>
 	<li>Click the link to download the zip with the modules.</li>
 	<li>Unzip the zip.</li>
-	<li>Copy the files to your boards "lib" directory (the sample code is not needed).</li>
-	<li>Don't forget to install adafruit_hid too if it's not already there.</li>
+	<li>Copy the files to your boards "lib" directory (not the sample code).</li>
+	<li>Don't forget ton install adafruit_hid too if it's not already there.</li>
 	<li>Follow the sample code, included in the zip.</li>
-	<li>Come bother me <a href="https://adafru.it/discord">on discord</a> if it doesn't work (no private messages).</li>
+	<li>Come bother me <a href="https://adafru.it/discord">on the adafruit discord</a> if it doesn't work (no private messages).</li>
+	<li>Or <a href="https://github.com/Neradoc/Circuitpython_Keyboard_Layouts/issues">open an issue on github</a>.</li>
 </ul>
 <p class="note">Note: There are additional links to have the module files pre-compiled for Circuitpython 6 or 7. A pre-compiled (.mpy) file takes less space and is faster to load. It also requires less RAM to load, which <i>might</i> allow it to be used on a SAMD21 board (often refered to M0, they are very limited in memory when running Circuitpython).</p>
 <p>
@@ -100,6 +100,7 @@
 	<a class="download_link" id="download_link" href="">Download the zip file (.py)</a>
 	<a class="download_link" id="download_link6" href="">CP6</a>
 	<a class="download_link" id="download_link7" href="">CP7</a>
+	<a class="download_link" id="download_link8" href="">CP8</a>
 <p>
 <div id="debug_area">
 	<pre id="debug">DEBUG</pre>
