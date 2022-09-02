@@ -90,22 +90,22 @@ MPYCROSSES = {
     "darwin": {
         "mpy6": "mpy-cross-macos-catalina-6.3.0",
         "mpy7": "mpy-cross-macos-universal-7.3.0",
-        "mpy8": "mpy-cross-macos-universal-8.0.0-alpha.1",
+        "mpy8": "mpy-cross-macos-11-8.0.0-beta.0-x64",
     },
     "linux": {
         "mpy6": "mpy-cross.static-amd64-linux-6.3.0",
         "mpy7": "mpy-cross.static-amd64-linux-7.3.0",
-        "mpy8": "mpy-cross.static-amd64-linux-8.0.0-alpha.1",
+        "mpy8": "mpy-cross.static-amd64-linux-8.0.0-beta.0",
     },
     "win32": {
         "mpy6": "mpy-cross.static-x64-windows-6.3.0.exe",
         "mpy7": "mpy-cross.static-x64-windows-7.3.0.exe",
-        "mpy8": "mpy-cross.static-x64-windows-8.0.0-alpha.1.exe",
+        "mpy8": "mpy-cross.static-x64-windows-8.0.0-beta.0.exe",
     },
     "raspbian": {
         "mpy6": "mpy-cross.static-raspbian-6.3.0",
         "mpy7": "mpy-cross.static-raspbian-7.3.0",
-        "mpy8": "mpy-cross.static-raspbian-8.0.0-alpha.1",
+        "mpy8": "mpy-cross.static-raspbian-8.0.0-beta.0",
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
