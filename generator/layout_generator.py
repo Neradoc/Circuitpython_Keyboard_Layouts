@@ -57,8 +57,7 @@ ALTGR_FLAG = 0x80
 """ no altgr flag for the first combined key """
 NO_ALTGR_FLAG = 0x00
 
-COMMON_HEADER_COPYRIGHT = """# SPDX-FileCopyrightText: 2021 Neradoc NeraOnGit@ri1.fr
-#
+COMMON_HEADER_COPYRIGHT = """# SPDX-FileCopyrightText: 2022 Neradoc NeraOnGit@ri1.fr
 # SPDX-License-Identifier: MIT
 \"\"\"
 This file was automatically generated using Circuitpython_Keyboard_Layouts
