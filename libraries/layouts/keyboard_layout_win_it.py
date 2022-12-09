@@ -136,13 +136,13 @@ class KeyboardLayout(KeyboardLayoutBase):
         b'\x1b'  # 'x'
         b'\x1c'  # 'y'
         b'\x1d'  # 'z'
-        b'\x00'
+        b'\xaf'  # '{'
         b'\xb5'  # '|'
-        b'\x00'
+        b'\xb0'  # '}'
         b'\x00'
         b'\x00'
     )
-    NEED_ALTGR = '#@[]€'
+    NEED_ALTGR = '#@[]€{}'
     HIGHER_ASCII = {
         0xa3: 0xa0,  # '£'
         0x20ac: 0x22,  # '€'
