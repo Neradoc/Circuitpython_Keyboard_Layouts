@@ -16,6 +16,12 @@ import zipfile
 import requests
 import semver
 
+if sys.argv and sys.argv[-1].upper() == "DEBUG":
+    def debug(text):
+        print(text)
+else:
+    def debug(text):
+        pass
 
 def get_git_command(command):
     """Execute and return the result of a git command without error."""
@@ -75,10 +81,9 @@ REQUIREMENTS_FILE = "requirements-modules.txt"
 SET_VERSION_PATTERN = "\n__version__ = '{}'\n"
 THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
-PLATFORMS = ["mpy6", "mpy7", "mpy8"]
+PLATFORMS = ["mpy7", "mpy8"]
 PLATFORM_NAMES = {
     "py": "py",
-    "mpy6": "6.x-mpy",
     "mpy7": "7.x-mpy",
     "mpy8": "8.x-mpy",
 }
@@ -88,27 +93,29 @@ PLATFORM_NAMES = {
 MPYCROSS_URL = "https://adafruit-circuit-python.s3.amazonaws.com/bin/mpy-cross/"
 MPYCROSSES = {
     "darwin": {
-        "mpy6": "mpy-cross-macos-catalina-6.3.0",
-        "mpy7": "mpy-cross-macos-universal-7.3.0",
-        "mpy8": "mpy-cross-macos-11-8.0.0-beta.0-x64",
+        "mpy7": ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
+        "mpy8": ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
     },
     "linux": {
-        "mpy6": "mpy-cross.static-amd64-linux-6.3.0",
-        "mpy7": "mpy-cross.static-amd64-linux-7.3.0",
-        "mpy8": "mpy-cross.static-amd64-linux-8.0.0-beta.0",
+        "mpy7": ["linux-amd64", "mpy-cross.static-amd64-linux-7.3.3"],
+        "mpy8": ["linux-amd64", "mpy-cross.static-amd64-linux-8.0.2"],
     },
     "win32": {
-        "mpy6": "mpy-cross.static-x64-windows-6.3.0.exe",
-        "mpy7": "mpy-cross.static-x64-windows-7.3.0.exe",
-        "mpy8": "mpy-cross.static-x64-windows-8.0.0-beta.0.exe",
+        "mpy7": ["windows", "mpy-cross.static-x64-windows-7.3.3.exe"],
+        "mpy8": ["windows", "mpy-cross-windows-8.1.0-beta.0.static.exe"],
     },
     "raspbian": {
-        "mpy6": "mpy-cross.static-raspbian-6.3.0",
-        "mpy7": "mpy-cross.static-raspbian-7.3.0",
-        "mpy8": "mpy-cross.static-raspbian-8.0.0-beta.0",
+        "mpy7": ["linux-raspbian", "mpy-cross.static-raspbian-7.3.0"],
+        "mpy8": ["linux-raspbian", "mpy-cross.static-raspbian-8.0.2"],
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
+
+def MPYCROSS_LINK(version):
+    return MPYCROSS_URL + "/".join(MPYCROSS[version])
+
+def MPYCROSS_FILE(version):
+    return os.path.join(BUILD_DEPS, MPYCROSS[version][-1])
 
 
 def file_version_tag(path):
@@ -180,9 +187,9 @@ def init_directories():
     for platform in ["py"] + PLATFORMS:
         bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
         zip_file = BUNDLE_ZIP.format(platform=PLATFORM_NAMES[platform])
-        if os.path.isdir(bun_dir):
+        while os.path.isdir(bun_dir):
             shutil.rmtree(bun_dir)
-        if os.path.isfile(zip_file):
+        while os.path.isfile(zip_file):
             os.unlink(zip_file)
 
 
@@ -278,27 +285,34 @@ def make_the_mpy_bundles():
 
     # download the mpycrosses
     for cross in MPYCROSS:
-        cross_file = os.path.join(BUILD_DEPS, MPYCROSS[cross])
+        cross_file = MPYCROSS_FILE(cross)
         if not os.path.isfile(cross_file):
-            url = MPYCROSS_URL + MPYCROSS[cross]
+            debug("Dowloading")
+            debug(cross_file)
+            url = MPYCROSS_LINK(cross)
             response = requests.get(url)
             with open(cross_file, "wb") as cross_fp:
                 cross_fp.write(response.content)
             fstats = os.stat(cross_file)
             os.chmod(cross_file, fstats.st_mode | stat.S_IEXEC)
+        else:
+            debug("Exists: " + os.path.basename(cross_file))
 
     # duplicate the py dir to mpy dirs
     pwd = os.getcwd()
     for platform in PLATFORMS:
-        cross = os.path.join(BUILD_DEPS, MPYCROSS[platform])
+        cross = MPYCROSS_FILE(platform)
         cross = os.path.abspath(cross)
         bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
         lib_dir = BUNDLE_LIB_DIR.format(platform=PLATFORM_NAMES[platform])
+        debug(f"{platform}: Duplicating")
+        debug(f"  {lib_dir}")
         shutil.copytree(fmt(BUNDLE_DIR), bun_dir)
         # run mpy-cross in each of those
         os.chdir(lib_dir)
         for lib_file in glob.glob(os.path.join("*.py")):
             mpy_file = lib_file.replace(".py", ".mpy")
+            debug(f"  • MPY file: {mpy_file}")
             subprocess.call([cross, lib_file, "-o", mpy_file])
             os.unlink(lib_file)
         os.chdir(pwd)
@@ -312,6 +326,8 @@ def do_the_zips():
         bun_dir = BUNDLE_DIR.format(platform=PLATFORM_NAMES[platform])
         zip_file = BUNDLE_ZIP.format(platform=PLATFORM_NAMES[platform])
         all_files = list_all_files(bun_dir)
+        debug("Making zip")
+        debug(f"  {zip_file}")
         with zipfile.ZipFile(zip_file, "w") as bundle:
             # metadata (bundler version)
             # build_metadata = {"build-tools-version": build_tools_version}
