@@ -81,12 +81,13 @@ REQUIREMENTS_FILE = "requirements-modules.txt"
 SET_VERSION_PATTERN = "\n__version__ = '{}'\n"
 THIS_REPOSITORY = "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git"
 
-PLATFORMS = ["mpy7", "mpy8", "mpy9"]
+PLATFORMS = ["mpy7", "mpy8", "mpy9", "mpy10"]
 PLATFORM_NAMES = {
     "py": "py",
     "mpy7": "7.x-mpy",
     "mpy8": "8.x-mpy",
     "mpy9": "9.x-mpy",
+    "mpy10": "10.x-mpy",
 }
 
 # https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/
@@ -94,24 +95,28 @@ PLATFORM_NAMES = {
 MPYCROSS_URL = "https://adafruit-circuit-python.s3.amazonaws.com/bin/mpy-cross/"
 MPYCROSSES = {
     "darwin": {
-        "mpy7": ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
-        "mpy8": ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
-        "mpy9": ["macos-11", "mpy-cross-macos-11-9.0.0-alpha.2-universal"],
+        "mpy7":  ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
+        "mpy8":  ["macos-11", "mpy-cross-macos-11-8.0.2-universal"],
+        "mpy9":  ["macos-11", "mpy-cross-macos-11-9.2.7-universal"],
+        "mpy10": ["macos-11", "mpy-cross-macos-11-10.0.0-alpha.2-universal"],
     },
     "linux": {
-        "mpy7": ["linux-amd64", "mpy-cross.static-amd64-linux-7.3.3"],
-        "mpy8": ["linux-amd64", "mpy-cross.static-amd64-linux-8.0.2"],
-        "mpy9": ["linux-amd64", "mpy-cross-linux-amd64-9.0.0-alpha.2.static"],
+        "mpy7":  ["linux-amd64", "mpy-cross.static-amd64-linux-7.3.3"],
+        "mpy8":  ["linux-amd64", "mpy-cross.static-amd64-linux-8.0.2"],
+        "mpy9":  ["linux-amd64", "mpy-cross-linux-amd64-9.2.7.static"],
+        "mpy10": ["linux-amd64", "mpy-cross-linux-amd64-10.0.0-alpha.2.static"],
     },
     "win32": {
-        "mpy7": ["windows", "mpy-cross.static-x64-windows-7.3.3.exe"],
-        "mpy8": ["windows", "mpy-cross-windows-8.1.0-beta.0.static.exe"],
-        "mpy9": ["windows", "mpy-cross-windows-9.0.0-alpha.2.static.exe"],
+        "mpy7":  ["windows", "mpy-cross.static-x64-windows-7.3.3.exe"],
+        "mpy8":  ["windows", "mpy-cross-windows-8.2.0.static.exe"],
+        "mpy9":  ["windows", "mpy-cross-windows-9.2.7.static.exe"],
+        "mpy10": ["windows", "mpy-cross-windows-10.0.0-alpha.2.static.exe"],
     },
     "raspbian": {
-        "mpy7": ["linux-raspbian", "mpy-cross.static-raspbian-7.3.0"],
-        "mpy8": ["linux-raspbian", "mpy-cross.static-raspbian-8.0.2"],
-        "mpy9": ["linux-raspbian", "mpy-cross-linux-raspbian-9.0.0-alpha.2.static-raspbian"],
+        "mpy7":  ["linux-raspbian", "mpy-cross.static-raspbian-7.3.0"],
+        "mpy8":  ["linux-raspbian", "mpy-cross.static-raspbian-8.0.2"],
+        "mpy9":  ["linux-raspbian", "mpy-cross-linux-raspbian-9.2.7.static-raspbian"],
+        "mpy10": ["linux-raspbian", "mpy-cross-linux-raspbian-10.0.0-alpha.2.static-raspbian"],
     },
 }
 MPYCROSS = MPYCROSSES[sys.platform]
